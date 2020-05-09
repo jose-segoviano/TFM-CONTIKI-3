@@ -85,7 +85,20 @@ typedef uint16_t rpl_ocp_t;
 /* IANA Objective Code Point as defined in RFC6550 */
 #define RPL_OCP_OF0     0
 #define RPL_OCP_MRHOF   1
-
+// JSG - INI Object definition to work with position
+#define RPL_NODE_POSITION_TYPE_MOBILE 'M'
+#define RPL_NODE_POSITION_TYPE_REFERENCE 'R'
+struct rpl_node_position {
+  uint8_t x[4];
+  uint8_t y[4];
+  int8_t rssi[4];
+  unsigned long last_update[4];
+  unsigned char type[4];
+  uip_ipaddr_t ipaddr[4];
+};
+typedef struct rpl_node_position rpl_node_position_t;
+//JSG - FIN
+/*---------------------------------------------------------------------------*/
 struct rpl_metric_object_energy {
   uint8_t flags;
   uint8_t energy_est;
@@ -102,6 +115,7 @@ struct rpl_metric_container {
     struct rpl_metric_object_energy energy;
     uint16_t etx;
   } obj;
+
 };
 typedef struct rpl_metric_container rpl_metric_container_t;
 /*---------------------------------------------------------------------------*/
@@ -293,7 +307,11 @@ uip_ds6_nbr_t *rpl_get_nbr(rpl_parent_t *parent);
 void rpl_print_neighbor_list(void);
 int rpl_process_srh_header(void);
 int rpl_srh_get_next_hop(uip_ipaddr_t *ipaddr);
-
+// JSG - INI
+void rpl_set_node_position(uint8_t x, uint8_t y, unsigned char type);
+rpl_node_position_t *rpl_get_node_position(void);
+void rpl_print_positions(const char *str);
+// JSG - FIN
 /* Per-parent RPL information */
 NBR_TABLE_DECLARE(rpl_parents);
 

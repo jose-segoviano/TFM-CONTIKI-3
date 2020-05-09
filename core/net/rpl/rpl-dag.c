@@ -54,6 +54,8 @@
 #include "lib/list.h"
 #include "lib/memb.h"
 #include "sys/ctimer.h"
+#include "net/packetbuf.h"
+#include "lib/calc-coordenate.c" // JSG - lib to cal x,y coordenates
 
 #include <limits.h>
 #include <string.h>
@@ -86,7 +88,114 @@ NBR_TABLE_GLOBAL(rpl_parent_t, rpl_parents);
 /* Allocate instance table. */
 rpl_instance_t instance_table[RPL_MAX_INSTANCES];
 rpl_instance_t *default_instance;
+/*---------------------------------------------------------------------------*/
+// JSG - INI - Object declaration
+rpl_node_position_t node_position;
+/*---------------------------------------------------------------------------*/
+// JSG - INI - Funciones para ayudar obtener y actualizar la posición
+/*---------------------------------------------------------------------------*/
+void
+rpl_node_position_init()
+{
+  // Initialize node_position.
+  uint8_t i;
+  for(i=0; i<4; i++) {
+    node_position.x[i] = 0;
+    node_position.y[i] = 0;
+    node_position.rssi[i] = INT8_MIN;
+    node_position.ipaddr[i].u8[15] = 0;
+    node_position.last_update[i] = 0;
+    node_position.type[i] = RPL_NODE_POSITION_TYPE_MOBILE;
+  }
+}
+/*---------------------------------------------------------------------------*/
+void
+rpl_print_positions(const char *str)
+{
+  uint8_t i;
+  for (i = 0; i<4; i++) {
+    
+    printf("JSG - %s - rpl_print_positions - x:%u, y:%u, RSSI:%i - ip:%3u, time:%lu, type:%c, elemento:%i\n", 
+            str,
+            node_position.x[i],
+            node_position.y[i],
+            node_position.rssi[i], 
+            node_position.ipaddr[i].u8[15], 
+            node_position.last_update[i], 
+            node_position.type[i], i);
+            
+  }
+}
+/*---------------------------------------------------------------------------*/
+void 
+rpl_set_node_position(uint8_t x, uint8_t y, unsigned char type)
+{
+  // update the position object based on node IP
+  node_position.x[0] = x;
+  node_position.y[0] = y;
+  node_position.last_update[0] = clock_seconds();
+  node_position.type[0] = type;
+}
+/*---------------------------------------------------------------------------*/
+rpl_node_position_t *
+rpl_get_node_position(void)
+{
+  return &node_position;
+}
+/*---------------------------------------------------------------------------*/
+void
+rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int8_t rssi, uip_ipaddr_t ipaddr, unsigned char type)
+{
+  //printf("JSG - rpl_set_node_position_ip_nbr - x:%i, y:%i, rssi: %i, source: %3u\n", x, y, rssi, ipaddr.u8[15]);
+  // Update a table with nodes indexed by ip
+  // save coordenates, rssi and ip source.
+  // rssi get from packetbuff
+  //rpl_node_position_t data;
+  //printf("JSG - rpl_set_node_position_ip_nbr - rssi[1]:%i, rssi[2]:%i, rssi[3]:%i\n",
+          //node_position.rssi[1], node_position.rssi[2], node_position.rssi[3]);
+  if (x != 0 && y != 0){
 
+    unsigned char sigue;
+    sigue = '1';
+    uint8_t indice, indice_sel;
+    indice = 1;
+    indice_sel = 0;
+    int8_t max_rssi = rssi;
+    //long time = clock_seconds();
+    printf("JSG - rpl_set_node_position_ip_nbr - x:%u, y:%u, rssi:%i, ip:%3u, type:%c\n", x, y, rssi, ipaddr.u8[15], type);
+    
+    while (sigue == '1') {
+        //printf("JSG - rpl_set_node_position_ip_nbr - ipaddr:%u, ipaddr_elem:%u, elemento:%u\n", 
+                //ipaddr.u8[15], node_position.ipaddr[indice].u8[15], indice);
+        if (ipaddr.u8[15] == node_position.ipaddr[indice].u8[15]) {
+          sigue = '0';
+          indice_sel = indice;
+          //if (abs(rssi) != abs(node_position.rssi[indice])) {
+            //indice_sel = indice;  
+          //}
+        } else if (ipaddr.u8[15] != node_position.ipaddr[indice].u8[15]) {
+          if (max_rssi > node_position.rssi[indice]) {
+            indice_sel = indice;
+            max_rssi = node_position.rssi[indice];
+          }
+        }
+      //}
+      indice++;
+      if (indice == 4) {
+        sigue = '0';
+      }
+    }
+    if (indice_sel > 0) {
+      node_position.x[indice_sel] = x;
+      node_position.y[indice_sel] = y;
+      node_position.rssi[indice_sel] = rssi;
+      node_position.ipaddr[indice_sel] = ipaddr; 
+      node_position.last_update[indice_sel] = clock_seconds(); 
+      node_position.type[indice_sel] = type;
+    }
+  }
+}
+// JSG - FIN
 /*---------------------------------------------------------------------------*/
 void
 rpl_print_neighbor_list(void)
@@ -114,7 +223,6 @@ rpl_print_neighbor_list(void)
       );
       p = nbr_table_next(rpl_parents, p);
     }
-    printf("RPL: end of list\n");
   }
 }
 /*---------------------------------------------------------------------------*/
@@ -139,6 +247,9 @@ void
 rpl_dag_init(void)
 {
   nbr_table_register(rpl_parents, (nbr_table_callback *)nbr_callback);
+  // JSG - INI
+  rpl_node_position_init();
+  // JSG - FIN
 }
 /*---------------------------------------------------------------------------*/
 rpl_parent_t *
@@ -1450,7 +1561,6 @@ rpl_process_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
     PRINTF("RPL: Ignoring a DIO with an unsupported MOP: %d\n", dio->mop);
     return;
   }
-
   dag = get_dag(dio->instance_id, &dio->dag_id);
   instance = rpl_get_instance(dio->instance_id);
 
@@ -1626,6 +1736,16 @@ rpl_process_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
     uip_ds6_defrt_add(from, RPL_DEFAULT_ROUTE_INFINITE_LIFETIME ? 0 : RPL_LIFETIME(instance, instance->default_lifetime));
   }
   p->dtsn = dio->dtsn;
+    // Ini - JSG
+  //printf("JSG - DIO - x:%u, y:%u, type:%c, ip%3u\n", dio->x, dio->y, dio->type, from->u8[15]);
+  if (node_position.type[0] == RPL_NODE_POSITION_TYPE_MOBILE){
+    if (dio->type == RPL_NODE_POSITION_TYPE_REFERENCE) {
+      rpl_set_node_position_ip_nbr(dio->x, dio->y, dio->rssi, *from, dio->type);
+      //set_node_position_calculated(&node_position);  
+    }
+    rpl_print_positions("Dio");
+  }
+  // Fin - JSG
 }
 /*---------------------------------------------------------------------------*/
 /** @} */

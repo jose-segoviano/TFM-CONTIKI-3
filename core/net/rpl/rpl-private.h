@@ -89,6 +89,7 @@
 #define RPL_OPTION_SOLICITED_INFO        7
 #define RPL_OPTION_PREFIX_INFO           8
 #define RPL_OPTION_TARGET_DESC           9
+#define RPL_OPTION_POSITION             10 // JSG - option to send position in payload
 
 #define RPL_DAO_K_FLAG                   0x80 /* DAO ACK requested */
 #define RPL_DAO_D_FLAG                   0x40 /* DODAG ID present */
@@ -308,6 +309,10 @@ struct rpl_dio {
   rpl_prefix_t destination_prefix;
   rpl_prefix_t prefix_info;
   struct rpl_metric_container mc;
+  uint8_t x; // JSG - X coordenate node from
+  uint8_t y; // JSG - Y coordenate node from
+  int8_t rssi; // JSG - RSSI node from
+  unsigned char type; // JSG - node type. mobile or reference
 };
 typedef struct rpl_dio rpl_dio_t;
 
