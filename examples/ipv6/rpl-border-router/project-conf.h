@@ -27,7 +27,6 @@
  * SUCH DAMAGE.
  *
  */
-
 #ifndef PROJECT_ROUTER_CONF_H_
 #define PROJECT_ROUTER_CONF_H_
 

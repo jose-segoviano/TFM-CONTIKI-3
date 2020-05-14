@@ -311,7 +311,7 @@ struct rpl_dio {
   struct rpl_metric_container mc;
   uint8_t x; // JSG - X coordenate node from
   uint8_t y; // JSG - Y coordenate node from
-  int8_t rssi; // JSG - RSSI node from
+  int16_t rssi; // JSG - RSSI node from
   unsigned char type; // JSG - node type. mobile or reference
 };
 typedef struct rpl_dio rpl_dio_t;

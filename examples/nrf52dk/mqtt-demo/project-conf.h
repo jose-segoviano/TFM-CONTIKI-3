@@ -44,7 +44,8 @@
 #define MQTT_DEMO_STATUS_LED      LEDS_GREEN
 
 /* If undefined, the demo will attempt to connect to IBM's quickstart */
-#define MQTT_DEMO_BROKER_IP_ADDR "fd00::215:83ff:fed2:dbd7"
+//#define MQTT_DEMO_BROKER_IP_ADDR "fd00::215:83ff:fed2:dbd7"
+#define MQTT_DEMO_BROKER_IP_ADDR "aaaa::1"
 /*---------------------------------------------------------------------------*/
 #endif /* PROJECT_CONF_H_ */
 /*---------------------------------------------------------------------------*/

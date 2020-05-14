@@ -51,7 +51,7 @@
 #include "sys/ctimer.h"
 #include "lib/sensors.h"
 #include "dev/button-sensor.h"
-#include "dev/temperature-sensor.h"
+//#include "dev/temperature-sensor.h"
 #include "dev/leds.h"
 
 #include <string.h>
@@ -484,7 +484,8 @@ publish(void)
   buf_ptr += len;
 
   len = snprintf(buf_ptr, remaining, ",\"On-Chip Temp (deg.C)\":%d",
-                 temperature_sensor.value(0));
+                 34);
+                 //temperature_sensor.value(0));
 
   if(len < 0 || len >= remaining) {
     printf("Buffer too short. Have %d, need %d + \\0\n", remaining, len);
@@ -510,6 +511,7 @@ static void
 connect_to_broker(void)
 {
   /* Connect to MQTT server */
+  printf("JSG - connect to broker: %c\n", conf.broker_ip);
   mqtt_connect(&conn, conf.broker_ip, conf.broker_port,
                conf.pub_interval * 3);
 
@@ -530,12 +532,13 @@ ping_parent(void)
 static void
 state_machine(void)
 {
+  printf("JSG - state:%i\n", state);
   switch(state) {
   case STATE_INIT:
     /* If we have just been configured register MQTT connection */
     mqtt_register(&conn, &mqtt_demo_process, client_id, mqtt_event,
                   MAX_TCP_SEGMENT_SIZE);
-
+    printf("JSG - Registro mqtt\n");
     /*
      * If we are not using the quickstart service (thus we are an IBM
      * registered device), we need to provide user name and password
@@ -575,10 +578,12 @@ state_machine(void)
     leds_on(STATUS_LED);
     ctimer_set(&ct, CONNECTING_LED_DURATION, publish_led_off, NULL);
     /* Not connected yet. Wait */
+    printf("JSG - connecting\n");
     DBG("Connecting (%u)\n", connect_attempt);
     break;
   case STATE_CONNECTED:
     /* Don't subscribe unless we are a registered device */
+    printf("JSG - conectado pero sin suscripcion\n");
     if(strncasecmp(conf.org_id, QUICKSTART, strlen(conf.org_id)) == 0) {
       DBG("Using 'quickstart': Skipping subscribe\n");
       state = STATE_PUBLISHING;
@@ -605,7 +610,7 @@ state_machine(void)
         publish();
       }
       etimer_set(&publish_periodic_timer, conf.pub_interval);
-
+      printf("JSG - publishing\n");
       DBG("Publishing\n");
       /* Return here so we don't end up rescheduling the timer */
       return;
@@ -619,6 +624,8 @@ state_machine(void)
        * trigger a new message and we wait for TCP to either ACK the entire
        * packet after retries, or to timeout and notify us.
        */
+      printf("JSG - Publishing... (MQTT state=%d, q=%u)\n", conn.state,
+          conn.out_queue_full);
       DBG("Publishing... (MQTT state=%d, q=%u)\n", conn.state,
           conn.out_queue_full);
     }
@@ -681,7 +688,8 @@ PROCESS_THREAD(mqtt_demo_process, ev, data)
 
   update_config();
 
-  def_rt_rssi = 0x8000000;
+  //def_rt_rssi = 0x8000000;
+  def_rt_rssi = 0x8000;
   uip_icmp6_echo_reply_callback_add(&echo_reply_notification,
                                     echo_reply_handler);
   etimer_set(&echo_request_timer, conf.def_rt_ping_interval);

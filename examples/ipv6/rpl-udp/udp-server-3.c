@@ -177,7 +177,7 @@ PROCESS_THREAD(udp_server_process, ev, data)
   PRINT6ADDR(&iplocaladdr);
   PRINTF("\n");
   // JSG - Después de inicializar el root del DAG, vamos a establecer las coordenadas de los nodos referencia.
-  rpl_set_node_position(40, 50, RPL_NODE_POSITION_TYPE_REFERENCE);
+  rpl_set_node_position(30, 50, RPL_NODE_POSITION_TYPE_REFERENCE);
   // JSG - FIN
 
   /* The data sink runs with a 100% duty cycle in order to ensure high 

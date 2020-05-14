@@ -102,7 +102,7 @@ rpl_node_position_init()
   for(i=0; i<4; i++) {
     node_position.x[i] = 0;
     node_position.y[i] = 0;
-    node_position.rssi[i] = INT8_MIN;
+    node_position.rssi[i] = INT16_MIN;
     node_position.ipaddr[i].u8[15] = 0;
     node_position.last_update[i] = 0;
     node_position.type[i] = RPL_NODE_POSITION_TYPE_MOBILE;
@@ -144,7 +144,7 @@ rpl_get_node_position(void)
 }
 /*---------------------------------------------------------------------------*/
 void
-rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int8_t rssi, uip_ipaddr_t ipaddr, unsigned char type)
+rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int16_t rssi, uip_ipaddr_t ipaddr, unsigned char type)
 {
   //printf("JSG - rpl_set_node_position_ip_nbr - x:%i, y:%i, rssi: %i, source: %3u\n", x, y, rssi, ipaddr.u8[15]);
   // Update a table with nodes indexed by ip
@@ -160,7 +160,7 @@ rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int8_t rssi, uip_ipaddr_t ipa
     uint8_t indice, indice_sel;
     indice = 1;
     indice_sel = 0;
-    int8_t max_rssi = rssi;
+    int16_t max_rssi = rssi;
     //long time = clock_seconds();
     printf("JSG - rpl_set_node_position_ip_nbr - x:%u, y:%u, rssi:%i, ip:%3u, type:%c\n", x, y, rssi, ipaddr.u8[15], type);
     
@@ -1741,10 +1741,11 @@ rpl_process_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
   if (node_position.type[0] == RPL_NODE_POSITION_TYPE_MOBILE){
     if (dio->type == RPL_NODE_POSITION_TYPE_REFERENCE) {
       rpl_set_node_position_ip_nbr(dio->x, dio->y, dio->rssi, *from, dio->type);
-      //set_node_position_calculated(&node_position);  
+      set_node_position_calculated(&node_position);  
     }
     rpl_print_positions("Dio");
   }
+  printf("JSG - RSSI: %i\n", dio->rssi);
   // Fin - JSG
 }
 /*---------------------------------------------------------------------------*/

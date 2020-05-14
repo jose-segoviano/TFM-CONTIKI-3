@@ -91,7 +91,7 @@ typedef uint16_t rpl_ocp_t;
 struct rpl_node_position {
   uint8_t x[4];
   uint8_t y[4];
-  int8_t rssi[4];
+  int16_t rssi[4];
   unsigned long last_update[4];
   unsigned char type[4];
   uip_ipaddr_t ipaddr[4];

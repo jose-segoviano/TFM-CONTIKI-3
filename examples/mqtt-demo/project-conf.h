@@ -44,7 +44,7 @@
 #define MQTT_DEMO_STATUS_LED      LEDS_GREEN
 #define MQTT_DEMO_PUBLISH_TRIGGER &button_right_sensor
 #define MQTT_DEMO_BROKER_IP_ADDR "aaaa::1"
-#define BOARD_STRING "Antonio"
+#define BOARD_STRING "test-mqtt"
 #undef NETSTACK_CONF_RDC
 #define NETSTACK_CONF_RDC     nullrdc_driver
 /*---------------------------------------------------------------------------*/

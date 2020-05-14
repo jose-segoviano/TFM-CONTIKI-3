@@ -31,9 +31,9 @@
 #include "contiki-conf.h"
 //#include "rpl/rpl-private.h"
 #include "mqtt.h"
-//#include "net/rpl/rpl.h"
-#include "net/routing/rpl-lite/rpl.h"
-#include "net/ipv6/uip.h"
+#include "net/rpl/rpl.h"
+//#include "net/routing/rpl-lite/rpl.h"
+#include "net/ip/uip.h"
 #include "net/ipv6/uip-icmp6.h"
 #include "net/ipv6/sicslowpan.h"
 #include "sys/etimer.h"
@@ -252,6 +252,7 @@ pub_handler(const char *topic, uint16_t topic_len, const uint8_t *chunk,
 static void
 mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
 {
+  printf("JSG - evento de la cola mqtt: %i\n", event);
   switch(event) {
   case MQTT_EVENT_CONNECTED: {
     DBG("APP - Application has a MQTT connection\n");
@@ -399,7 +400,6 @@ init_config()
          strlen(DEFAULT_EVENT_TYPE_ID));
   memcpy(conf.broker_ip, broker_ip, strlen(broker_ip));
   memcpy(conf.cmd_type, DEFAULT_SUBSCRIBE_CMD_TYPE, 1);
-
   conf.broker_port = DEFAULT_BROKER_PORT;
   conf.pub_interval = DEFAULT_PUBLISH_INTERVAL;
   conf.def_rt_ping_interval = DEFAULT_RSSI_MEAS_INTERVAL;
@@ -503,9 +503,9 @@ connect_to_broker(void)
   /* Connect to MQTT server */
   //mqtt_connect(&conn, conf.broker_ip, conf.broker_port,
     //           conf.pub_interval * 3);
+  printf("JSG - connect to broker: %c\n", conf.broker_ip[6]);
   mqtt_connect(&conn, conf.broker_ip, conf.broker_port,
-               (conf.pub_interval * 3) / CLOCK_SECOND,
-               MQTT_CLEAN_SESSION_ON);
+               (conf.pub_interval * 3) / CLOCK_SECOND);
 
   state = STATE_CONNECTING;
 }
@@ -550,14 +550,17 @@ state_machine(void)
     connect_attempt = 1;
 
     state = STATE_REGISTERED;
+    printf("JSG - STATE_INIT - client_id:%c\n", *client_id);
     DBG("Init\n");
     /* Continue */
   case STATE_REGISTERED:
+    printf("JSG - STATE_REGISTERED: %i\n", ADDR_PREFERRED);
     if(uip_ds6_get_global(ADDR_PREFERRED) != NULL) {
       /* Registered and with a public IP. Connect */
       DBG("Registered. Connect attempt %u\n", connect_attempt);
       ping_parent();
       connect_to_broker();
+      printf("JSG - conectado\n");
     } else {
       leds_on(STATUS_LED);
       ctimer_set(&ct, NO_NET_LED_DURATION, publish_led_off, NULL);
@@ -570,11 +573,14 @@ state_machine(void)
     ctimer_set(&ct, CONNECTING_LED_DURATION, publish_led_off, NULL);
     /* Not connected yet. Wait */
     DBG("Connecting (%u)\n", connect_attempt);
+    printf("JSG - STATE_CONNECTING\n");
     break;
   case STATE_CONNECTED:
+    printf("JSG - STATE_CONNECTED\n");
     /* Don't subscribe unless we are a registered device */
     if(strncasecmp(conf.org_id, QUICKSTART, strlen(conf.org_id)) == 0) {
       DBG("Using 'quickstart': Skipping subscribe\n");
+      printf("JSG - Cambiamos estado a STATE_PUBLISHING\n");
       state = STATE_PUBLISHING;
     }
     /* Continue */

@@ -38,5 +38,6 @@ extern const struct sensors_sensor button_sensor;
 extern const struct sensors_sensor button_sensor2;
 
 #define BUTTON_SENSOR "Button"
+#define BUTTON_SENSOR_VALUE_STATE    0 // JSG - para que funcione la demo de mqtt
 
 #endif /* BUTTON_SENSOR_H_ */
