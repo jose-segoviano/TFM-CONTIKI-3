@@ -311,6 +311,7 @@ int rpl_srh_get_next_hop(uip_ipaddr_t *ipaddr);
 void rpl_set_node_position(uint8_t x, uint8_t y, unsigned char type);
 rpl_node_position_t *rpl_get_node_position(void);
 void rpl_print_positions(const char *str);
+void position_to_str(char *str);
 // JSG - FIN
 /* Per-parent RPL information */
 NBR_TABLE_DECLARE(rpl_parents);

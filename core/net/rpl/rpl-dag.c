@@ -128,6 +128,16 @@ rpl_print_positions(const char *str)
 }
 /*---------------------------------------------------------------------------*/
 void 
+position_to_str(char *str)
+{  
+  sprintf(str, "IP:%u|x:%u|y:%u|type:%c", 
+    node_position.ipaddr[0].u8[15],
+    node_position.x[0],
+    node_position.y[0],
+    node_position.type[0]);
+}
+/*---------------------------------------------------------------------------*/
+void 
 rpl_set_node_position(uint8_t x, uint8_t y, unsigned char type)
 {
   // update the position object based on node IP

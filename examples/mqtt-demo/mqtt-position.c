@@ -35,14 +35,14 @@
 //#include "net/routing/rpl-lite/rpl.h"
 #include "net/ip/uip.h"
 #include "net/ipv6/uip-icmp6.h"
-#include "net/ipv6/sicslowpan.h"
+//#include "net/ipv6/sicslowpan.h"
 #include "sys/etimer.h"
 #include "sys/ctimer.h"
-#include "lib/sensors.h"
-#include "dev/button-sensor.h"
-#include "dev/leds.h"
+//#include "lib/sensors.h"
+//#include "dev/button-sensor.h"
+//#include "dev/leds.h"
 //#include "dev/sht25.h"
-#include <string.h>
+//#include <string.h>
 
 /*---------------------------------------------------------------------------*/
 /*
@@ -154,7 +154,7 @@ typedef struct mqtt_client_config {
  */
 #define BUFFER_SIZE 64
 static char client_id[BUFFER_SIZE];
-static char pub_topic[BUFFER_SIZE];
+//static char pub_topic[BUFFER_SIZE];
 static char sub_topic[BUFFER_SIZE];
 /*---------------------------------------------------------------------------*/
 /*
@@ -163,7 +163,7 @@ static char sub_topic[BUFFER_SIZE];
  */
 #define APP_BUFFER_SIZE 256
 static struct mqtt_connection conn;
-static char app_buffer[APP_BUFFER_SIZE];
+//static char app_buffer[APP_BUFFER_SIZE];
 /*---------------------------------------------------------------------------*/
 #define QUICKSTART "quickstart"
 /*---------------------------------------------------------------------------*/
@@ -174,9 +174,9 @@ static char *buf_ptr;
 static uint16_t seq_nr_value = 0;
 /*---------------------------------------------------------------------------*/
 /* Parent RSSI functionality */
-static struct uip_icmp6_echo_reply_notification echo_reply_notification;
-static struct etimer echo_request_timer;
-static int def_rt_rssi = 0;
+//static struct uip_icmp6_echo_reply_notification echo_reply_notification;
+//static struct etimer echo_request_timer;
+//static int def_rt_rssi = 0;
 /*---------------------------------------------------------------------------*/
 static mqtt_client_config_t conf;
 /*---------------------------------------------------------------------------*/
@@ -208,60 +208,18 @@ ipaddr_sprintf(char *buf, uint8_t buf_len, const uip_ipaddr_t *addr)
 }
 /*---------------------------------------------------------------------------*/
 static void
-echo_reply_handler(uip_ipaddr_t *source, uint8_t ttl, uint8_t *data,
-                   uint16_t datalen)
-{
-  if(uip_ip6addr_cmp(source, uip_ds6_defrt_choose())) {
-    def_rt_rssi = sicslowpan_get_last_rssi();
-  }
-}
-/*---------------------------------------------------------------------------*/
-static void
-publish_led_off(void *d)
-{
-  leds_off(STATUS_LED);
-}
-/*---------------------------------------------------------------------------*/
-static void
-pub_handler(const char *topic, uint16_t topic_len, const uint8_t *chunk,
-            uint16_t chunk_len)
-{
-  DBG("Pub Handler: topic='%s' (len=%u), chunk_len=%u\n", topic, topic_len,
-      chunk_len);
-
-  /* If we don't like the length, ignore */
-  if(topic_len != 23 || chunk_len != 1) {
-    printf("Incorrect topic or chunk len. Ignored\n");
-    return;
-  }
-
-  /* If the format != json, ignore */
-  if(strncmp(&topic[topic_len - 4], "json", 4) != 0) {
-    printf("Incorrect format\n");
-  }
-
-  if(strncmp(&topic[10], "leds", 4) == 0) {
-    if(chunk[0] == '1') {
-      leds_on(LEDS_RED);
-    } else if(chunk[0] == '0') {
-      leds_off(LEDS_RED);
-    }
-    return;
-  }
-}
-/*---------------------------------------------------------------------------*/
-static void
 mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
 {
-  printf("JSG - evento de la cola mqtt: %i\n", event);
   switch(event) {
   case MQTT_EVENT_CONNECTED: {
+    printf("JSG - evento MQTT_EVENT_CONNECTED\n");
     DBG("APP - Application has a MQTT connection\n");
     timer_set(&connection_life, CONNECTION_STABLE_TIME);
     state = STATE_CONNECTED;
     break;
   }
   case MQTT_EVENT_DISCONNECTED: {
+    printf("JSG - evento MQTT_EVENT_DISCONNECTED\n");
     DBG("APP - MQTT Disconnect. Reason %u\n", *((mqtt_event_t *)data));
 
     state = STATE_DISCONNECTED;
@@ -269,8 +227,9 @@ mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
     break;
   }
   case MQTT_EVENT_PUBLISH: {
+    printf("JSG - evento MQTT_EVENT_PUBLISH\n");
     msg_ptr = data;
-
+    printf("JSG - evento topic: %s\n", msg_ptr->topic);
     /* Implement first_flag in publish message? */
     if(msg_ptr->first_chunk) {
       msg_ptr->first_chunk = 0;
@@ -278,49 +237,44 @@ mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
           "size is %i bytes. Content:\n\n",
           msg_ptr->topic, msg_ptr->payload_length);
     }
-
-    pub_handler(msg_ptr->topic, strlen(msg_ptr->topic), msg_ptr->payload_chunk,
-                msg_ptr->payload_length);
+    uint8_t *payload = msg_ptr->payload_chunk;
+    uint8_t i;
+    printf("JSG - evento mensaje: ");
+    for (i = 0; i < msg_ptr->payload_length; i++)
+    {
+      printf("%c", payload[i]);  
+    }
+    printf("\n");
+    //pub_handler(msg_ptr->topic, strlen(msg_ptr->topic), msg_ptr->payload_chunk,
+                //msg_ptr->payload_length);
     break;
   }
   case MQTT_EVENT_SUBACK: {
+    printf("JSG - evento MQTT_EVENT_SUBACK \n");
     DBG("APP - Application is subscribed to topic successfully\n");
     break;
   }
   case MQTT_EVENT_UNSUBACK: {
+    printf("JSG - MQTT_EVENT_UNSUBACK\n");
     DBG("APP - Application is unsubscribed to topic successfully\n");
     break;
   }
   case MQTT_EVENT_PUBACK: {
+    printf("JSG - evento MQTT_EVENT_PUBACK\n");
     DBG("APP - Publishing complete.\n");
     break;
   }
   default:
+    printf("JSG - evento default\n");
     DBG("APP - Application got a unhandled MQTT event: %i\n", event);
     break;
   }
 }
 /*---------------------------------------------------------------------------*/
 static int
-construct_pub_topic(void)
-{
-  int len = snprintf(pub_topic, BUFFER_SIZE, "iot-2/evt/%s/fmt/json",
-                     conf.event_type_id);
-
-  /* len < 0: Error. Len >= BUFFER_SIZE: Buffer too small */
-  if(len < 0 || len >= BUFFER_SIZE) {
-    printf("Pub Topic: %d, Buffer %d\n", len, BUFFER_SIZE);
-    return 0;
-  }
-
-  return 1;
-}
-/*---------------------------------------------------------------------------*/
-static int
 construct_sub_topic(void)
 {
-  int len = snprintf(sub_topic, BUFFER_SIZE, "iot-2/cmd/%s/fmt/json",
-                     conf.cmd_type);
+  int len = snprintf(sub_topic, BUFFER_SIZE, "/position/%02x", linkaddr_node_addr.u8[7]);
 
   /* len < 0: Error. Len >= BUFFER_SIZE: Buffer too small */
   if(len < 0 || len >= BUFFER_SIZE) {
@@ -360,12 +314,7 @@ update_config(void)
 
   if(construct_sub_topic() == 0) {
     /* Fatal error. Topic larger than the buffer */
-    state = STATE_CONFIG_ERROR;
-    return;
-  }
-
-  if(construct_pub_topic() == 0) {
-    /* Fatal error. Topic larger than the buffer */
+    printf("JSG - construct_sub_topic\n");
     state = STATE_CONFIG_ERROR;
     return;
   }
@@ -420,82 +369,6 @@ subscribe(void)
   if(status == MQTT_STATUS_OUT_QUEUE_FULL) {
     DBG("APP - Tried to subscribe but command queue was full!\n");
   }
-}
-/*---------------------------------------------------------------------------*/
-static void
-publish(void)
-{
-  /* Publish MQTT topic in IBM quickstart format */
-  int len;
-  int remaining = APP_BUFFER_SIZE;
-  //int16_t value;
-
-  seq_nr_value++;
-
-  buf_ptr = app_buffer;
-
-  len = snprintf(buf_ptr, remaining,
-                 "{"
-                 "\"d\":{"
-                 "\"myName\":\"%s\","
-                 "\"Seq #\":%d,"
-                 "\"Uptime (sec)\":%lu",
-                 BOARD_STRING, seq_nr_value, clock_seconds());
-
-  if(len < 0 || len >= remaining) {
-    printf("Buffer too short. Have %d, need %d + \\0\n", remaining, len);
-    return;
-  }
-
-  remaining -= len;
-  buf_ptr += len;
-
-  /* Put our Default route's string representation in a buffer */
-  char def_rt_str[64];
-  memset(def_rt_str, 0, sizeof(def_rt_str));
-  ipaddr_sprintf(def_rt_str, sizeof(def_rt_str), uip_ds6_defrt_choose());
-
-  len = snprintf(buf_ptr, remaining, ",\"Def Route\":\"%s\",\"RSSI (dBm)\":%d",
-                 def_rt_str, def_rt_rssi);
-
-  if(len < 0 || len >= remaining) {
-    printf("Buffer too short. Have %d, need %d + \\0\n", remaining, len);
-    return;
-  }
-  remaining -= len;
-  buf_ptr += len;
-/*
-  value = sht25.value(SHT25_VAL_TEMP);
-  len = snprintf(buf_ptr, remaining, ",\"SHT25 Temp (mC)\":%d", value);
-
-  if(len < 0 || len >= remaining) {
-    printf("Buffer too short. Have %d, need %d + \\0\n", remaining, len);
-    return;
-  }
-  remaining -= len;
-  buf_ptr += len;
-
-  value = sht25.value(SHT25_VAL_HUM);
-  len = snprintf(buf_ptr, remaining, ",\"Humidity (RH)\":%d", value);
-
-  if(len < 0 || len >= remaining) {
-    printf("Buffer too short. Have %d, need %d + \\0\n", remaining, len);
-    return;
-  }
-  remaining -= len;
-  buf_ptr += len;
-*/
-  len = snprintf(buf_ptr, remaining, "}}");
-
-  if(len < 0 || len >= remaining) {
-    printf("Buffer too short. Have %d, need %d + \\0\n", remaining, len);
-    return;
-  }
-
-  mqtt_publish(&conn, NULL, pub_topic, (uint8_t *)app_buffer,
-               strlen(app_buffer), MQTT_QOS_LEVEL_0, MQTT_RETAIN_OFF);
-
-  DBG("APP - Publish!\n");
 }
 /*---------------------------------------------------------------------------*/
 static void 
@@ -560,7 +433,10 @@ state_machine(void)
     connect_attempt = 1;
 
     state = STATE_REGISTERED;
-    printf("JSG - STATE_INIT - client_id:%c\n", *client_id);
+    printf("JSG - STATE_INIT - client_id:%s\n", client_id);
+    printf("JSG - IP: %02x - IP: ", linkaddr_node_addr.u8[7]);
+    print6addr(&linkaddr_node_addr);
+    printf("\n");
     DBG("Init\n");
     /* Continue */
   case STATE_REGISTERED:
@@ -570,17 +446,11 @@ state_machine(void)
       DBG("Registered. Connect attempt %u\n", connect_attempt);
       ping_parent();
       connect_to_broker();
-      printf("JSG - conectado\n");
-    } else {
-      leds_on(STATUS_LED);
-      ctimer_set(&ct, NO_NET_LED_DURATION, publish_led_off, NULL);
     }
     etimer_set(&publish_periodic_timer, NET_CONNECT_PERIODIC);
     return;
     break;
   case STATE_CONNECTING:
-    leds_on(STATUS_LED);
-    ctimer_set(&ct, CONNECTING_LED_DURATION, publish_led_off, NULL);
     /* Not connected yet. Wait */
     DBG("Connecting (%u)\n", connect_attempt);
     printf("JSG - STATE_CONNECTING\n");
@@ -607,15 +477,11 @@ state_machine(void)
     if(mqtt_ready(&conn) && conn.out_buffer_sent) {
       /* Connected. Publish */
       if(state == STATE_CONNECTED) {
+        printf("JSG - subscribe - state_machine\n");
         subscribe();
         state = STATE_PUBLISHING;
-      } else {
-        leds_on(STATUS_LED);
-        ctimer_set(&ct, PUBLISH_LED_ON_DURATION, publish_led_off, NULL);
-        publish();
       }
       etimer_set(&publish_periodic_timer, conf.pub_interval);
-
       DBG("Publishing\n");
       /* Return here so we don't end up rescheduling the timer */
       return;
@@ -691,35 +557,14 @@ PROCESS_THREAD(mqtt_demo_process, ev, data)
 
   update_config();
 
-  //SENSORS_ACTIVATE(sht25);
+  subscribe();
 
-  def_rt_rssi = 0x8000;
-  uip_icmp6_echo_reply_callback_add(&echo_reply_notification,
-                                    echo_reply_handler);
-  etimer_set(&echo_request_timer, conf.def_rt_ping_interval);
-
-  /* Main loop */
-  while(1) {
-
+  while(1)
+  {
     PROCESS_YIELD();
+    state_machine();
+    printf("JSG - ha llegado un evento\n");
 
-    if(ev == sensors_event && data == PUBLISH_TRIGGER) {
-      if(state == STATE_ERROR) {
-        connect_attempt = 1;
-        state = STATE_REGISTERED;
-      }
-    }
-
-    if((ev == PROCESS_EVENT_TIMER && data == &publish_periodic_timer) ||
-       ev == PROCESS_EVENT_POLL ||
-       (ev == sensors_event && data == PUBLISH_TRIGGER)) {
-      state_machine();
-    }
-
-    if(ev == PROCESS_EVENT_TIMER && data == &echo_request_timer) {
-      ping_parent();
-      etimer_set(&echo_request_timer, conf.def_rt_ping_interval);
-    }
   }
 
   PROCESS_END();

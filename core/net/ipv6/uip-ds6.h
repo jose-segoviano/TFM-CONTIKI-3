@@ -93,7 +93,8 @@
  * a Global ID of 0. For real deployments, make sure to install a pseudo-random
  * Global ID, e.g. in a RPL network, by configuring it at the root.
  */
-#define UIP_DS6_DEFAULT_PREFIX 0xfd00
+//#define UIP_DS6_DEFAULT_PREFIX 0xfd00
+#define UIP_DS6_DEFAULT_PREFIX 0xaaaa // JSG - to send package out of cooja.
 #endif /* UIP_CONF_DS6_DEFAULT_PREFIX */
 
 #define UIP_DS6_DEFAULT_PREFIX_0 ((UIP_DS6_DEFAULT_PREFIX >> 8) & 0xff)

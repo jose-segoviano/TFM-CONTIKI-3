@@ -28,6 +28,7 @@
  */
 
 #include "contiki.h"
+#include "net/rpl/rpl.h"
 #include "lib/random.h"
 #include "sys/ctimer.h"
 #include "net/ip/uip.h"
@@ -44,7 +45,8 @@
 #include "net/ipv6/uip-ds6-route.h"
 
 #define UDP_CLIENT_PORT 8765
-#define UDP_SERVER_PORT 5678
+//#define UDP_SERVER_PORT 5678
+#define UDP_SERVER_PORT 3000
 
 #define UDP_EXAMPLE_ID  190
 
@@ -87,7 +89,7 @@ static void
 send_packet(void *ptr)
 {
   char buf[MAX_PAYLOAD_LEN];
-
+  printf("JSG - send_packet\n");
 #ifdef SERVER_REPLY
   uint8_t num_used = 0;
   uip_ds6_nbr_t *nbr;
@@ -105,9 +107,14 @@ send_packet(void *ptr)
 #endif /* SERVER_REPLY */
 
   seq_id++;
-  PRINTF("DATA send to %d 'Hello %d'\n",
+  PRINTF("JSG - DATA send to %d 'Hello %d' IPv6: ",
          server_ipaddr.u8[sizeof(server_ipaddr.u8) - 1], seq_id);
-  sprintf(buf, "Hello %d from the client", seq_id);
+  PRINT6ADDR(&server_ipaddr);
+  PRINTF("\n");
+  //sprintf(buf, "Hello %d from the client", seq_id);
+  position_to_str(buf);
+  printf("JSG - buf:%s\n", buf);
+  //sprintf(buf, position_to_str());
   uip_udp_packet_sendto(client_conn, buf, strlen(buf),
                         &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
 }
@@ -163,7 +170,8 @@ set_global_address(void)
    uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0, 0, 1);
 #elif 1
 /* Mode 2 - 16 bits inline */
-  uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0x00ff, 0xfe00, 1);
+  //uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0x00ff, 0xfe00, 1);
+  uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0, 0, 0x0001); //JSG - localhost
 #else
 /* Mode 3 - derived from server link-local (MAC) address */
   uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0x0250, 0xc2ff, 0xfea8, 0xcd1a); //redbee-econotag

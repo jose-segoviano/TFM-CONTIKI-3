@@ -6,7 +6,7 @@ parser.add_argument("-b", "--buffer", help="Buffer size", default=1024, type=int
 args = parser.parse_args()
 
 import socket 
-IP = "::"
+IP = "aaaa::1"
 PORT = args.port
 
 sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
@@ -15,3 +15,4 @@ print("Server inicializado, esperando datos. Usar Ctrl+C para detener")
 while True:
 	data, address = sock.recvfrom(args.buffer)
 	print(data)
+	print(address)
