@@ -207,6 +207,22 @@ ipaddr_sprintf(char *buf, uint8_t buf_len, const uip_ipaddr_t *addr)
   return len;
 }
 /*---------------------------------------------------------------------------*/
+static void 
+pub_handler(const uint8_t *chunk, uint16_t chunk_len)
+{
+  printf("JSG - evento \n");
+  uint8_t i , x, y;
+  unsigned char *type;
+  char * token = strtok(chunk, "|");
+
+  x = atoi(token);
+  y = atoi(strtok(NULL, "|"));
+  type = strtok(NULL, "|");
+
+  printf("JSG - evento - x:%u y:%u type:%s\n", x, y, type);
+  rpl_set_node_position(x, y, *type);  
+}
+/*---------------------------------------------------------------------------*/
 static void
 mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
 {
@@ -237,16 +253,9 @@ mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
           "size is %i bytes. Content:\n\n",
           msg_ptr->topic, msg_ptr->payload_length);
     }
-    uint8_t *payload = msg_ptr->payload_chunk;
-    uint8_t i;
-    printf("JSG - evento mensaje: ");
-    for (i = 0; i < msg_ptr->payload_length; i++)
-    {
-      printf("%c", payload[i]);  
-    }
-    printf("\n");
-    //pub_handler(msg_ptr->topic, strlen(msg_ptr->topic), msg_ptr->payload_chunk,
-                //msg_ptr->payload_length);
+    // JSG - Después de inicializar el root del DAG, vamos a establecer las coordenadas de los nodos referencia.
+    pub_handler(msg_ptr->payload_chunk, msg_ptr->payload_length);
+    // JSG - FIN
     break;
   }
   case MQTT_EVENT_SUBACK: {
@@ -563,8 +572,6 @@ PROCESS_THREAD(mqtt_demo_process, ev, data)
   {
     PROCESS_YIELD();
     state_machine();
-    printf("JSG - ha llegado un evento\n");
-
   }
 
   PROCESS_END();

@@ -1753,9 +1753,8 @@ rpl_process_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
       rpl_set_node_position_ip_nbr(dio->x, dio->y, dio->rssi, *from, dio->type);
       set_node_position_calculated(&node_position);  
     }
-    rpl_print_positions("Dio");
   }
-  printf("JSG - RSSI: %i\n", dio->rssi);
+  rpl_print_positions("Dio");
   // Fin - JSG
 }
 /*---------------------------------------------------------------------------*/
