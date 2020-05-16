@@ -35,6 +35,7 @@
 #include "net/ipv6/uip-ds6.h"
 #include "net/ip/uip-udp-packet.h"
 #include "sys/ctimer.h"
+#include "dev/button-sensor.h"
 #ifdef WITH_COMPOWER
 #include "powertrace.h"
 #endif
@@ -71,6 +72,7 @@ AUTOSTART_PROCESSES(&udp_client_process);
 /*---------------------------------------------------------------------------*/
 static int seq_id;
 static int reply;
+static int x_std, y_std;
 
 static void
 tcpip_handler(void)
@@ -112,11 +114,24 @@ send_packet(void *ptr)
   PRINT6ADDR(&server_ipaddr);
   PRINTF("\n");
   //sprintf(buf, "Hello %d from the client", seq_id);
-  position_to_str(buf);
-  printf("JSG - buf:%s\n", buf);
-  //sprintf(buf, position_to_str());
-  uip_udp_packet_sendto(client_conn, buf, strlen(buf),
+  rpl_node_position_t *node_position = rpl_get_node_position();
+  if (node_position->x[0] != 0 && node_position->y[0] != 0)
+  {
+    printf("JSG - position x:%u, y:%u\n", x_std, y_std);
+    if (node_position->x[0] != x_std && node_position->y[0] != y_std)
+    {
+      x_std = node_position->x[0];
+      y_std = node_position->y[0];
+          position_to_str(buf);
+      printf("JSG - buf:%s\n", buf);
+      //sprintf(buf, position_to_str());
+      uip_udp_packet_sendto(client_conn, buf, strlen(buf),
                         &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
+    } else {
+      rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_REFERENCE);
+    }   
+  }
+  
 }
 /*---------------------------------------------------------------------------*/
 static void
@@ -190,7 +205,11 @@ PROCESS_THREAD(udp_client_process, ev, data)
 
   PROCESS_PAUSE();
 
+  SENSORS_ACTIVATE(button_sensor);
+
   set_global_address();
+  x_std = 0;
+  y_std = 0;
 
   PRINTF("UDP client process started nbr:%d routes:%d\n",
          NBR_TABLE_CONF_MAX_NEIGHBORS, UIP_CONF_MAX_ROUTES);
@@ -220,7 +239,9 @@ PROCESS_THREAD(udp_client_process, ev, data)
     if(ev == tcpip_event) {
       tcpip_handler();
     }
-
+    if (ev == sensors_event && data == &button_sensor) {
+      printf("JSG - boton pulsado\n");
+    }
     if(ev == serial_line_event_message && data != NULL) {
       char *str;
       str = data;

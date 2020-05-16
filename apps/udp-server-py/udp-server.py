@@ -15,4 +15,4 @@ print("Server inicializado, esperando datos. Usar Ctrl+C para detener")
 while True:
 	data, address = sock.recvfrom(args.buffer)
 	print(data)
-	print(address)
+	#print(address)

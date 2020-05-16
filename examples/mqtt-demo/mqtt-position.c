@@ -169,8 +169,8 @@ static struct mqtt_connection conn;
 /*---------------------------------------------------------------------------*/
 static struct mqtt_message *msg_ptr = 0;
 static struct etimer publish_periodic_timer;
-static struct ctimer ct;
-static char *buf_ptr;
+//static struct ctimer ct;
+//static char *buf_ptr;
 static uint16_t seq_nr_value = 0;
 /*---------------------------------------------------------------------------*/
 /* Parent RSSI functionality */
@@ -211,15 +211,15 @@ static void
 pub_handler(const uint8_t *chunk, uint16_t chunk_len)
 {
   printf("JSG - evento \n");
-  uint8_t i , x, y;
+  uint8_t x, y;
   unsigned char *type;
-  char * token = strtok(chunk, "|");
+  char * token = strtok((char *)chunk, "|");
 
   x = atoi(token);
   y = atoi(strtok(NULL, "|"));
-  type = strtok(NULL, "|");
+  type = (unsigned char *)strtok(NULL, "|");
 
-  printf("JSG - evento - x:%u y:%u type:%s\n", x, y, type);
+  printf("JSG - pub_handler - x:%u y:%u type:%s\n", x, y, type);
   rpl_set_node_position(x, y, *type);  
 }
 /*---------------------------------------------------------------------------*/
@@ -323,7 +323,6 @@ update_config(void)
 
   if(construct_sub_topic() == 0) {
     /* Fatal error. Topic larger than the buffer */
-    printf("JSG - construct_sub_topic\n");
     state = STATE_CONFIG_ERROR;
     return;
   }
@@ -380,22 +379,20 @@ subscribe(void)
   }
 }
 /*---------------------------------------------------------------------------*/
+/*
 static void 
 print6addr(char *addr)
 {
   printf(" %02u%02u:%02u%02u:%02u%02u:%02u%02u:%02u%02u:%02u%02u:%02u%02u:%02u%02u ", ((uint8_t *)addr)[0], ((uint8_t *)addr)[1], ((uint8_t *)addr)[2], ((uint8_t *)addr)[3], ((uint8_t *)addr)[4], ((uint8_t *)addr)[5], ((uint8_t *)addr)[6], ((uint8_t *)addr)[7], ((uint8_t *)addr)[8], ((uint8_t *)addr)[9], ((uint8_t *)addr)[10], ((uint8_t *)addr)[11], ((uint8_t *)addr)[12], ((uint8_t *)addr)[13], ((uint8_t *)addr)[14], ((uint8_t *)addr)[15]);
-}
+}*/
 /*---------------------------------------------------------------------------*/
 static void
 connect_to_broker(void)
 {
   /* Connect to MQTT server */
-  //mqtt_connect(&conn, conf.broker_ip, conf.broker_port,
-    //           conf.pub_interval * 3);
-  printf("JSG - connect to broker: %c\n", conf.broker_ip[6]);
-  printf("JSG - IPv6: ");
-  print6addr(conf.broker_ip);
-  printf("\n");
+  //printf("JSG - IPv6: ");
+  //print6addr(conf.broker_ip);
+  //printf("\n");
   mqtt_connect(&conn, conf.broker_ip, conf.broker_port,
                (conf.pub_interval * 3) / CLOCK_SECOND);
 
@@ -443,9 +440,6 @@ state_machine(void)
 
     state = STATE_REGISTERED;
     printf("JSG - STATE_INIT - client_id:%s\n", client_id);
-    printf("JSG - IP: %02x - IP: ", linkaddr_node_addr.u8[7]);
-    print6addr(&linkaddr_node_addr);
-    printf("\n");
     DBG("Init\n");
     /* Continue */
   case STATE_REGISTERED:
@@ -462,10 +456,8 @@ state_machine(void)
   case STATE_CONNECTING:
     /* Not connected yet. Wait */
     DBG("Connecting (%u)\n", connect_attempt);
-    printf("JSG - STATE_CONNECTING\n");
     break;
   case STATE_CONNECTED:
-    printf("JSG - STATE_CONNECTED\n");
     /* Don't subscribe unless we are a registered device */
     if(strncasecmp(conf.org_id, QUICKSTART, strlen(conf.org_id)) == 0) {
       DBG("Using 'quickstart': Skipping subscribe\n");

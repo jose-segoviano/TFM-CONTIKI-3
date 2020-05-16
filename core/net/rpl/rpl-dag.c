@@ -130,8 +130,8 @@ rpl_print_positions(const char *str)
 void 
 position_to_str(char *str)
 {  
-  sprintf(str, "IP:%u|x:%u|y:%u|type:%c", 
-    node_position.ipaddr[0].u8[15],
+  sprintf(str, "IP:%02x|x:%u|y:%u|type:%c", 
+    node_position.ipaddr[0].u8[7],
     node_position.x[0],
     node_position.y[0],
     node_position.type[0]);
@@ -145,6 +145,7 @@ rpl_set_node_position(uint8_t x, uint8_t y, unsigned char type)
   node_position.y[0] = y;
   node_position.last_update[0] = clock_seconds();
   node_position.type[0] = type;
+  node_position.ipaddr[0].u8[7] = linkaddr_node_addr.u8[7];
 }
 /*---------------------------------------------------------------------------*/
 rpl_node_position_t *
@@ -1753,8 +1754,8 @@ rpl_process_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
       rpl_set_node_position_ip_nbr(dio->x, dio->y, dio->rssi, *from, dio->type);
       set_node_position_calculated(&node_position);  
     }
+    rpl_print_positions("Dio");
   }
-  rpl_print_positions("Dio");
   // Fin - JSG
 }
 /*---------------------------------------------------------------------------*/
