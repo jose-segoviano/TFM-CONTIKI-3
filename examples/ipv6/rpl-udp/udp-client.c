@@ -117,7 +117,7 @@ send_packet(void *ptr)
   rpl_node_position_t *node_position = rpl_get_node_position();
   if (node_position->x[0] != 0 && node_position->y[0] != 0)
   {
-    printf("JSG - position x:%u, y:%u\n", x_std, y_std);
+    printf("JSG - position x:%u, y:%u, type:%c\n", x_std, y_std, node_position->type[0]);
     if (node_position->x[0] != x_std && node_position->y[0] != y_std)
     {
       x_std = node_position->x[0];
@@ -127,6 +127,7 @@ send_packet(void *ptr)
       //sprintf(buf, position_to_str());
       uip_udp_packet_sendto(client_conn, buf, strlen(buf),
                         &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
+      rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_MOBILE);
     } else {
       rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_REFERENCE);
     }   
@@ -241,6 +242,8 @@ PROCESS_THREAD(udp_client_process, ev, data)
     }
     if (ev == sensors_event && data == &button_sensor) {
       printf("JSG - boton pulsado\n");
+      rpl_node_position_init();
+      //rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_MOBILE);
     }
     if(ev == serial_line_event_message && data != NULL) {
       char *str;

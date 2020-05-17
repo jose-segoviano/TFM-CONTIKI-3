@@ -308,6 +308,7 @@ void rpl_print_neighbor_list(void);
 int rpl_process_srh_header(void);
 int rpl_srh_get_next_hop(uip_ipaddr_t *ipaddr);
 // JSG - INI
+void rpl_node_position_init();
 void rpl_set_node_position(uint8_t x, uint8_t y, unsigned char type);
 rpl_node_position_t *rpl_get_node_position(void);
 void rpl_print_positions(const char *str);

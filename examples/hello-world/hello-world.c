@@ -38,14 +38,13 @@
  */
 
 #include "contiki.h"
-#include "dev/adxl345.h"
+#include "dev/button-sensor.h"
 
 #include <stdio.h> /* For printf() */
 
 #define ACCM_READ_INTERVAL	CLOCK_SECOND
 
-static int16_t x,y,z;
-static process_event_t et;
+//static process_event_t et;
 /*---------------------------------------------------------------------------*/
 PROCESS(hello_world_process, "Hello world process");
 AUTOSTART_PROCESSES(&hello_world_process);
@@ -53,22 +52,19 @@ AUTOSTART_PROCESSES(&hello_world_process);
 PROCESS_THREAD(hello_world_process, ev, data)
 {
   PROCESS_BEGIN();
+  SENSORS_ACTIVATE(button_sensor);
     /* Start and setup the accelerometer with default values, eg no interrupts enabled. */
-  accm_init();
 
   while (1){
-    //PROCESS_YIELD();
+    PROCESS_YIELD();
+    printf("JSG - evento\n");
+    if (ev == sensors_event && data == &button_sensor) {
+      printf("JSG - boton pulsado\n");
+    }
+  
 /*-------------------------------- Motion Tracking --------------------------*/
-    x = accm_read_axis(X_AXIS);
-    y = accm_read_axis(Y_AXIS);
-    z = accm_read_axis(Z_AXIS);
-    printf("JSG - x: %d y: %d z: %d\n", x, y, z);
-    etimer_set(&et, ACCM_READ_INTERVAL);
-    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
 
   }
-
-  printf("Hello, world\n");
   
   PROCESS_END();
 }

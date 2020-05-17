@@ -29,20 +29,12 @@
  */
 /*---------------------------------------------------------------------------*/
 #include "contiki-conf.h"
-//#include "rpl/rpl-private.h"
 #include "mqtt.h"
 #include "net/rpl/rpl.h"
-//#include "net/routing/rpl-lite/rpl.h"
 #include "net/ip/uip.h"
 #include "net/ipv6/uip-icmp6.h"
-//#include "net/ipv6/sicslowpan.h"
 #include "sys/etimer.h"
 #include "sys/ctimer.h"
-//#include "lib/sensors.h"
-//#include "dev/button-sensor.h"
-//#include "dev/leds.h"
-//#include "dev/sht25.h"
-//#include <string.h>
 
 /*---------------------------------------------------------------------------*/
 /*
@@ -56,13 +48,6 @@ static const char *broker_ip = MQTT_DEMO_BROKER_IP_ADDR;
  * disconnect)
  */
 #define STATE_MACHINE_PERIODIC     (CLOCK_SECOND >> 1)
-/*---------------------------------------------------------------------------*/
-/* Provide visible feedback via LEDS during various states */
-/* When connecting to broker */
-#define CONNECTING_LED_DURATION    (CLOCK_SECOND >> 2)
-
-/* Each time we try to publish */
-#define PUBLISH_LED_ON_DURATION    (CLOCK_SECOND)
 /*---------------------------------------------------------------------------*/
 /* Connections and reconnections */
 #define RETRY_FOREVER              0xFF
@@ -96,14 +81,11 @@ static uint8_t state;
 #define CONFIG_CMD_TYPE_LEN       8
 #define CONFIG_IP_ADDR_STR_LEN   64
 /*---------------------------------------------------------------------------*/
-#define RSSI_MEASURE_INTERVAL_MAX 86400 /* secs: 1 day */
-#define RSSI_MEASURE_INTERVAL_MIN     5 /* secs */
 #define PUBLISH_INTERVAL_MAX      86400 /* secs: 1 day */
 #define PUBLISH_INTERVAL_MIN          5 /* secs */
 /*---------------------------------------------------------------------------*/
 /* A timeout used when waiting to connect to a network */
 #define NET_CONNECT_PERIODIC        (CLOCK_SECOND >> 2)
-#define NO_NET_LED_DURATION         (NET_CONNECT_PERIODIC >> 1)
 /*---------------------------------------------------------------------------*/
 /* Default configuration values */
 #define DEFAULT_TYPE_ID             "cc2538"
@@ -115,9 +97,6 @@ static uint8_t state;
 #define DEFAULT_KEEP_ALIVE_TIMER    60
 #define DEFAULT_RSSI_MEAS_INTERVAL  (CLOCK_SECOND * 30)
 /*---------------------------------------------------------------------------*/
-/* Take a sensor reading on button press */
-#define PUBLISH_TRIGGER &button_sensor
-
 /* Payload length of ICMPv6 echo requests used to measure RSSI with def rt */
 #define ECHO_REQ_PAYLOAD_LEN   20
 /*---------------------------------------------------------------------------*/
@@ -141,8 +120,6 @@ typedef struct mqtt_client_config {
 /*---------------------------------------------------------------------------*/
 /* Maximum TCP segment size for outgoing segments of our socket */
 #define MAX_TCP_SEGMENT_SIZE    32
-/*---------------------------------------------------------------------------*/
-#define STATUS_LED LEDS_GREEN
 /*---------------------------------------------------------------------------*/
 /*
  * Buffers for Client ID and Topic.
@@ -210,7 +187,6 @@ ipaddr_sprintf(char *buf, uint8_t buf_len, const uip_ipaddr_t *addr)
 static void 
 pub_handler(const uint8_t *chunk, uint16_t chunk_len)
 {
-  printf("JSG - evento \n");
   uint8_t x, y;
   unsigned char *type;
   char * token = strtok((char *)chunk, "|");
@@ -235,7 +211,6 @@ mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
     break;
   }
   case MQTT_EVENT_DISCONNECTED: {
-    printf("JSG - evento MQTT_EVENT_DISCONNECTED\n");
     DBG("APP - MQTT Disconnect. Reason %u\n", *((mqtt_event_t *)data));
 
     state = STATE_DISCONNECTED;
@@ -243,9 +218,7 @@ mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
     break;
   }
   case MQTT_EVENT_PUBLISH: {
-    printf("JSG - evento MQTT_EVENT_PUBLISH\n");
     msg_ptr = data;
-    printf("JSG - evento topic: %s\n", msg_ptr->topic);
     /* Implement first_flag in publish message? */
     if(msg_ptr->first_chunk) {
       msg_ptr->first_chunk = 0;
@@ -259,22 +232,19 @@ mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
     break;
   }
   case MQTT_EVENT_SUBACK: {
-    printf("JSG - evento MQTT_EVENT_SUBACK \n");
+    printf("JSG - evento MQTT_EVENT_SUBACK\n");
     DBG("APP - Application is subscribed to topic successfully\n");
     break;
   }
   case MQTT_EVENT_UNSUBACK: {
-    printf("JSG - MQTT_EVENT_UNSUBACK\n");
     DBG("APP - Application is unsubscribed to topic successfully\n");
     break;
   }
   case MQTT_EVENT_PUBACK: {
-    printf("JSG - evento MQTT_EVENT_PUBACK\n");
     DBG("APP - Publishing complete.\n");
     break;
   }
   default:
-    printf("JSG - evento default\n");
     DBG("APP - Application got a unhandled MQTT event: %i\n", event);
     break;
   }
@@ -439,11 +409,9 @@ state_machine(void)
     connect_attempt = 1;
 
     state = STATE_REGISTERED;
-    printf("JSG - STATE_INIT - client_id:%s\n", client_id);
     DBG("Init\n");
     /* Continue */
   case STATE_REGISTERED:
-    printf("JSG - STATE_REGISTERED: %i\n", ADDR_PREFERRED);
     if(uip_ds6_get_global(ADDR_PREFERRED) != NULL) {
       /* Registered and with a public IP. Connect */
       DBG("Registered. Connect attempt %u\n", connect_attempt);
@@ -461,7 +429,6 @@ state_machine(void)
     /* Don't subscribe unless we are a registered device */
     if(strncasecmp(conf.org_id, QUICKSTART, strlen(conf.org_id)) == 0) {
       DBG("Using 'quickstart': Skipping subscribe\n");
-      printf("JSG - Cambiamos estado a STATE_PUBLISHING\n");
       state = STATE_PUBLISHING;
     }
     /* Continue */
@@ -478,7 +445,6 @@ state_machine(void)
     if(mqtt_ready(&conn) && conn.out_buffer_sent) {
       /* Connected. Publish */
       if(state == STATE_CONNECTED) {
-        printf("JSG - subscribe - state_machine\n");
         subscribe();
         state = STATE_PUBLISHING;
       }
@@ -530,7 +496,6 @@ state_machine(void)
     return;
   case STATE_ERROR:
   default:
-    leds_on(STATUS_LED);
     /*
      * 'default' should never happen.
      *
@@ -549,8 +514,6 @@ PROCESS_THREAD(mqtt_demo_process, ev, data)
 {
 
   PROCESS_BEGIN();
-
-  printf("MQTT Demo Process\n");
 
   if(init_config() != 1) {
     PROCESS_EXIT();

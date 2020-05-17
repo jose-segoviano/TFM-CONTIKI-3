@@ -180,12 +180,12 @@
 
 /* Handle 10 neighbors */
 #ifndef NBR_TABLE_CONF_MAX_NEIGHBORS
-#define NBR_TABLE_CONF_MAX_NEIGHBORS    15
+#define NBR_TABLE_CONF_MAX_NEIGHBORS    4 // JSG - cambiado a 3 para mejorar RAM. era 15
 #endif
 
 /* Handle 10 routes    */
 #ifndef UIP_CONF_MAX_ROUTES
-#define UIP_CONF_MAX_ROUTES             15
+#define UIP_CONF_MAX_ROUTES             4 // JSG - cambiado a 3 para mejorar RAM. era 15
 #endif
 
 #define UIP_CONF_ND6_SEND_RA            0
@@ -203,7 +203,7 @@
 #define UIP_CONF_BUFFER_SIZE            140
 #endif
 
-#define SICSLOWPAN_CONF_COMPRESSION             SICSLOWPAN_COMPRESSION_HC06
+#define SICSLOWPAN_CONF_COMPRESSION             SICSLOWPAN_COMPRESSION_IPV6 // Cambiado para mejorar RAM. era HC06
 #ifndef SICSLOWPAN_CONF_FRAG
 #define SICSLOWPAN_CONF_FRAG                    1
 #define SICSLOWPAN_CONF_MAXAGE                  8
@@ -239,7 +239,7 @@
 
 #define UIP_CONF_TCP_SPLIT                      0
 
-#define BOARD_STRING        "Zolertia Z1 platform"
+//#define BOARD_STRING        "Zolertia Z1 platform"
 
 #ifndef AES_128_CONF
 #define AES_128_CONF cc2420_aes_128_driver

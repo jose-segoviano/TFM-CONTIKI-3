@@ -41,8 +41,8 @@
 #define PROJECT_CONF_H_
 /*---------------------------------------------------------------------------*/
 /* User configuration */
-#define MQTT_DEMO_STATUS_LED      LEDS_GREEN
-#define MQTT_DEMO_PUBLISH_TRIGGER &button_right_sensor
+//#define MQTT_DEMO_STATUS_LED      LEDS_GREEN
+//#define MQTT_DEMO_PUBLISH_TRIGGER &button_right_sensor
 #define MQTT_DEMO_BROKER_IP_ADDR "aaaa::1"
 #define BOARD_STRING "test-mqtt"
 #undef NETSTACK_CONF_RDC
