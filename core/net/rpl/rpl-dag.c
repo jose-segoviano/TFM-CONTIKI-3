@@ -116,7 +116,8 @@ rpl_print_positions(const char *str)
   uint8_t i;
   for (i = 0; i<4; i++) {
     
-    printf("JSG - %s - rpl_print_positions - x:%u, y:%u, RSSI:%i - ip:%3u, time:%lu, type:%c, elemento:%i\n", 
+    printf("JSG - %u - %s - rpl_print_positions - x:%u, y:%u, RSSI:%i - ip:%3u, time:%lu, type:%c, elemento:%i\n", 
+            node_position.ipaddr[0].u8[15],
             str,
             node_position.x[i],
             node_position.y[i],
@@ -132,7 +133,7 @@ void
 position_to_str(char *str)
 {  
   sprintf(str, "IP:%02x|x:%u|y:%u|type:%c", 
-    node_position.ipaddr[0].u[15],
+    node_position.ipaddr[0].u8[15],
     node_position.x[0],
     node_position.y[0],
     node_position.type[0]);
@@ -175,6 +176,21 @@ rpl_get_node_position(void)
   return &node_position;
 }
 /*---------------------------------------------------------------------------*/
+void 
+clean_old_references ()
+{
+  uint8_t indice;
+  for (indice = 1; indice < 4; indice++) {
+    if ((clock_seconds() - node_position.last_update[indice]) > 200) {
+      node_position.x[indice] = 0;
+      node_position.y[indice] = 0;
+      node_position.rssi[indice] = INT16_MIN;
+      node_position.ipaddr[indice].u8[15] = 0; 
+      node_position.last_update[indice] = 0;
+      node_position.type[indice] = ' ';
+    }
+  }
+}
 void
 rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int16_t rssi, uip_ipaddr_t ipaddr, unsigned char type)
 {
@@ -185,11 +201,12 @@ rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int16_t rssi, uip_ipaddr_t ip
     use a temp object to order the table in the good way taking in account the stronger RSSI
   */
   int16_t rssi_temp = rssi;
+  /*
   uip_ipaddr_t addr_temp = ipaddr;
   uint8_t x_temp = x;
   uint8_t y_temp = y;
   unsigned char type_temp = type;
-  unsigned long last_update_temp;
+  unsigned long last_update_temp;*/
 
   printf("JSG - rpl_set_node_position_ip_nbr - x:%u, y:%u, rssi:%i, ip:%3u, type:%c\n", x, y, rssi, ipaddr.u8[15], type);
   if (x != 0 && y != 0){
@@ -203,56 +220,32 @@ rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int16_t rssi, uip_ipaddr_t ip
     //int16_t max_rssi = rssi;
     //long time = clock_seconds();
     //printf("JSG - rpl_set_node_position_ip_nbr - x:%u, y:%u, rssi:%i, ip:%3u, type:%c\n", x, y, rssi, ipaddr.u8[15], type);
-    
+    //clean_old_references();
     while (sigue == '1') {
-        //printf("JSG - rpl_set_node_position_ip_nbr - ipaddr:%u, ipaddr_elem:%u, elemento:%u\n", 
-                //ipaddr.u8[15], node_position.ipaddr[indice].u8[15], indice);
-        if (addr_temp.u8[15] == node_position.ipaddr[indice].u8[15]) {
-          sigue = '0';
-          //indice_sel = indice;
-          if (rssi_temp != node_position.rssi[indice]) {
-            indice_sel = indice;  
-          }
-        } else if (ipaddr.u8[15] != node_position.ipaddr[indice].u8[15]) {
-          if (rssi_temp > node_position.rssi[indice]) {
-            // Change temp reg 
-            x_temp = node_position.x[indice];
-            y_temp = node_position.y[indice];
-            rssi_temp = node_position.rssi[indice];
-            addr_temp = node_position.ipaddr[indice]; 
-            last_update_temp = node_position.last_update[indice]; 
-            type_temp = node_position.type[indice];
-            
-            node_position.x[indice] = x;
-            node_position.y[indice] = y;
-            node_position.rssi[indice] = rssi;
-            node_position.ipaddr[indice] = ipaddr; 
-            node_position.last_update[indice] = last_update; 
-            node_position.type[indice] = type;
-            
-            x = x_temp;
-            y = y_temp;
-            rssi = rssi_temp;
-            ipaddr = addr_temp;
-            last_update = last_update_temp;
-            type = type_temp;
-
-            //indice_sel = indice;
-            //max_rssi = node_position.rssi[indice];
-          }
+      if (ipaddr.u8[15] == node_position.ipaddr[indice].u8[15]) {
+        indice_sel = 0;
+        if (rssi != node_position.rssi[indice]) {
+          indice_sel = indice;
         }
-      //}
+        sigue = '0';
+      } else {
+        if (rssi > node_position.rssi[indice] && sigue == '1' && rssi_temp > node_position.rssi[indice]) {
+          indice_sel = indice;
+          rssi_temp = node_position.rssi[indice];
+        }
+      }
       indice++;
       if (indice == 4) {
         sigue = '0';
       }
     }
+
     if (indice_sel > 0) {
       node_position.x[indice_sel] = x;
       node_position.y[indice_sel] = y;
       node_position.rssi[indice_sel] = rssi;
       node_position.ipaddr[indice_sel] = ipaddr; 
-      node_position.last_update[indice_sel] = clock_seconds(); 
+      node_position.last_update[indice_sel] = last_update;
       node_position.type[indice_sel] = type;
     }
   }

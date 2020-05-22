@@ -129,7 +129,8 @@ send_packet(void *ptr)
                         &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
       rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_MOBILE);
     } else {
-      rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_REFERENCE);
+      printf("JSG - Cambio a referencia\n");
+      //rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_REFERENCE);
     }   
   }
   
