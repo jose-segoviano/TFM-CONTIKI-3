@@ -177,6 +177,24 @@ rpl_get_node_position(void)
 }
 /*---------------------------------------------------------------------------*/
 void 
+rpl_clean_position_table(uip_ipaddr_t ipaddr)
+{
+  uint8_t indice;
+  for (indice = 1; indice < 4; indice++) {
+    if (ipaddr.u8[15] == node_position.ipaddr[indice].u8[15]) {
+      node_position.x[indice] = 0;
+      node_position.y[indice] = 0;
+      node_position.rssi[indice] = INT16_MIN;
+      node_position.ipaddr[indice].u8[15] = 0; 
+      node_position.last_update[indice] = 0;
+      node_position.type[indice] = ' ';
+
+      rpl_set_node_position(0, 0, node_position.type[0]);
+    }
+  }
+}
+/*---------------------------------------------------------------------------*/
+void 
 clean_old_references ()
 {
   uint8_t indice;
@@ -191,6 +209,7 @@ clean_old_references ()
     }
   }
 }
+/*---------------------------------------------------------------------------*/
 void
 rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int16_t rssi, uip_ipaddr_t ipaddr, unsigned char type)
 {
@@ -1797,6 +1816,8 @@ rpl_process_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
     if (dio->type == RPL_NODE_POSITION_TYPE_REFERENCE) {
       rpl_set_node_position_ip_nbr(dio->x, dio->y, dio->rssi, *from, dio->type);
       set_node_position_calculated(&node_position);  
+    } else {
+      rpl_clean_position_table(*from);
     }
     rpl_print_positions("Dio");
   }

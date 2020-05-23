@@ -2,6 +2,8 @@ all: udp-client udp-server
 CONTIKI=../../..
 
 CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\"
+# Seconds to send coordenates by UDP
+PERIOD = 5
 
 ifdef WITH_COMPOWER
 APPS+=powertrace

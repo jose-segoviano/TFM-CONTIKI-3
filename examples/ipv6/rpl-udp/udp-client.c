@@ -73,6 +73,7 @@ AUTOSTART_PROCESSES(&udp_client_process);
 static int seq_id;
 static int reply;
 static int x_std, y_std;
+static unsigned char type;
 
 static void
 tcpip_handler(void)
@@ -127,10 +128,12 @@ send_packet(void *ptr)
       //sprintf(buf, position_to_str());
       uip_udp_packet_sendto(client_conn, buf, strlen(buf),
                         &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
-      rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_MOBILE);
+      //type = RPL_NODE_POSITION_TYPE_MOBILE;
+      rpl_set_node_position(x_std, y_std, type);
     } else {
       printf("JSG - Cambio a referencia\n");
-      //rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_REFERENCE);
+      //type = RPL_NODE_POSITION_TYPE_REFERENCE;
+      rpl_set_node_position(x_std, y_std, type);
     }   
   }
   
@@ -212,6 +215,7 @@ PROCESS_THREAD(udp_client_process, ev, data)
   set_global_address();
   x_std = 0;
   y_std = 0;
+  type = RPL_NODE_POSITION_TYPE_MOBILE;
 
   PRINTF("UDP client process started nbr:%d routes:%d\n",
          NBR_TABLE_CONF_MAX_NEIGHBORS, UIP_CONF_MAX_ROUTES);

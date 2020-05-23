@@ -1,7 +1,8 @@
 CONTIKI_PROJECT=border-router
 all: $(CONTIKI_PROJECT) 
 
-CONTIKI=../../..
+#CONTIKI=../../..
+CONTIKI=/home/chema/TFM-CONTIKI-3
 
 #linker optimizations
 SMALL=1
