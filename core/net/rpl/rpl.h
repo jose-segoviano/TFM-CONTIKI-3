@@ -88,9 +88,13 @@ typedef uint16_t rpl_ocp_t;
 // JSG - INI Object definition to work with position
 #define RPL_NODE_POSITION_TYPE_MOBILE 'M'
 #define RPL_NODE_POSITION_TYPE_REFERENCE 'R'
+#ifndef LAST_UPDATE_LIMIT
+#define LAST_UPDATE_LIMIT  100
+#endif // LAST_UPDATE_LIMIT
+
 struct rpl_node_position {
-  uint8_t x[4];
-  uint8_t y[4];
+  uint16_t x[4];
+  uint16_t y[4];
   int16_t rssi[4];
   unsigned long last_update[4];
   unsigned char type[4];
@@ -309,7 +313,7 @@ int rpl_process_srh_header(void);
 int rpl_srh_get_next_hop(uip_ipaddr_t *ipaddr);
 // JSG - INI
 void rpl_node_position_init();
-void rpl_set_node_position(uint8_t x, uint8_t y, unsigned char type);
+void rpl_set_node_position(uint16_t x, uint16_t y, unsigned char type);
 rpl_node_position_t *rpl_get_node_position(void);
 void rpl_print_positions(const char *str);
 void position_to_str(char *str);

@@ -160,7 +160,7 @@ get_local_address()
 }
 /*---------------------------------------------------------------------------*/
 void 
-rpl_set_node_position(uint8_t x, uint8_t y, unsigned char type)
+rpl_set_node_position(uint16_t x, uint16_t y, unsigned char type)
 {
   // update the position object based on node IP
   node_position.x[0] = x;
@@ -199,7 +199,7 @@ clean_old_references ()
 {
   uint8_t indice;
   for (indice = 1; indice < 4; indice++) {
-    if ((clock_seconds() - node_position.last_update[indice]) > 200) {
+    if ((clock_seconds() - node_position.last_update[indice]) > LAST_UPDATE_LIMIT) {
       node_position.x[indice] = 0;
       node_position.y[indice] = 0;
       node_position.rssi[indice] = INT16_MIN;
@@ -211,7 +211,7 @@ clean_old_references ()
 }
 /*---------------------------------------------------------------------------*/
 void
-rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int16_t rssi, uip_ipaddr_t ipaddr, unsigned char type)
+rpl_set_node_position_ip_nbr(uint16_t x, uint16_t y, int16_t rssi, uip_ipaddr_t ipaddr, unsigned char type)
 {
   //printf("JSG - rpl_set_node_position_ip_nbr - x:%i, y:%i, rssi: %i, source: %3u\n", x, y, rssi, ipaddr.u8[15]);
   // Update a table with nodes indexed by ip
@@ -220,14 +220,8 @@ rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int16_t rssi, uip_ipaddr_t ip
     use a temp object to order the table in the good way taking in account the stronger RSSI
   */
   int16_t rssi_temp = rssi;
-  /*
-  uip_ipaddr_t addr_temp = ipaddr;
-  uint8_t x_temp = x;
-  uint8_t y_temp = y;
-  unsigned char type_temp = type;
-  unsigned long last_update_temp;*/
 
-  printf("JSG - rpl_set_node_position_ip_nbr - x:%u, y:%u, rssi:%i, ip:%3u, type:%c\n", x, y, rssi, ipaddr.u8[15], type);
+  printf("JSG - %u - rpl_set_node_position_ip_nbr - x:%u, y:%u, rssi:%i, ip:%3u, type:%c\n", node_position.ipaddr[0].u8[15], x, y, rssi, ipaddr.u8[15], type);
   if (x != 0 && y != 0){
 
     unsigned char sigue;
@@ -236,10 +230,8 @@ rpl_set_node_position_ip_nbr(uint8_t x, uint8_t y, int16_t rssi, uip_ipaddr_t ip
     indice = 1;
     indice_sel = 0;
     unsigned long last_update = clock_seconds();
-    //int16_t max_rssi = rssi;
-    //long time = clock_seconds();
     //printf("JSG - rpl_set_node_position_ip_nbr - x:%u, y:%u, rssi:%i, ip:%3u, type:%c\n", x, y, rssi, ipaddr.u8[15], type);
-    //clean_old_references();
+    clean_old_references();
     while (sigue == '1') {
       if (ipaddr.u8[15] == node_position.ipaddr[indice].u8[15]) {
         indice_sel = 0;

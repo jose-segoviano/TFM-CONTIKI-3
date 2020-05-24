@@ -187,7 +187,7 @@ ipaddr_sprintf(char *buf, uint8_t buf_len, const uip_ipaddr_t *addr)
 static void 
 pub_handler(const uint8_t *chunk, uint16_t chunk_len)
 {
-  uint8_t x, y;
+  uint16_t x, y;
   unsigned char *type;
   char * token = strtok((char *)chunk, "|");
 

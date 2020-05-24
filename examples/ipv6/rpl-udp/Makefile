@@ -4,6 +4,7 @@ CONTIKI=../../..
 CFLAGS += -DPROJECT_CONF_H=\"project-conf.h\"
 # Seconds to send coordenates by UDP
 PERIOD = 5
+LAST_UPDATE_LIMIT = 100
 
 ifdef WITH_COMPOWER
 APPS+=powertrace

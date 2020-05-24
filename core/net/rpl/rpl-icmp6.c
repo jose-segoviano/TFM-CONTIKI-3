@@ -342,7 +342,7 @@ dio_input(void)
     if(subopt_type == RPL_OPTION_PAD1) {
       len = 1;
     } else if (subopt_type == RPL_OPTION_POSITION) {
-      len = 4; // JSG - Space needed for positioning
+      len = 6; // JSG - Space needed for positioning - 4
     }else {
       /* Suboption with a two-byte header + payload */
       len = 2 + buffer[i + 1];
@@ -453,10 +453,12 @@ dio_input(void)
         break;
       // JSG - INI - new option to read from payload option
       case RPL_OPTION_POSITION:
-        dio.x = buffer[i+1];
-        dio.y = buffer[i+2];
+        dio.x = get16(buffer, i+1);
+        //dio.x = buffer[i+1]; // con uint8
+        //dio.y = buffer[i+2]; // con uint8
+        dio.y = get16(buffer, i+3);
         dio.rssi = packetbuf_attr(PACKETBUF_ATTR_RSSI);
-        dio.type = buffer[i+3];
+        dio.type = buffer[i+5]; // i+3 con uint8
         //printf("JSG - len:%i\n", len);
         //printf("JSG - position x:%u, y:%u, type:%c\n", dio.x, dio.y, dio.type);
         break;
@@ -607,8 +609,12 @@ dio_output(rpl_instance_t *instance, uip_ipaddr_t *uc_addr)
   // JSG - INI Send the position and the node type.
   buffer[pos++] = RPL_OPTION_POSITION;
   rpl_node_position_t *node_position = rpl_get_node_position();
-  buffer[pos++] = node_position->x[0];
-  buffer[pos++] = node_position->y[0];
+  set16(buffer, pos, node_position->x[0]); // con uint16
+  pos += 2; // con uint16
+  set16(buffer, pos, node_position->y[0]); // con uint16
+  //buffer[pos++] = node_position->x[0]; // con uint8
+  pos += 2; // con uint16
+  //buffer[pos++] = node_position->y[0]; // con uint8
   buffer[pos++] = node_position->type[0];
   //printf("JSG - output length: %i\n", pos);
   // JSG - FIN
