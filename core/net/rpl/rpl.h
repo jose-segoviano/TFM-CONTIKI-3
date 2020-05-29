@@ -317,6 +317,7 @@ void rpl_set_node_position(uint16_t x, uint16_t y, unsigned char type);
 rpl_node_position_t *rpl_get_node_position(void);
 void rpl_print_positions(const char *str);
 void position_to_str(char *str);
+void position_to_JSON(char *str);
 // JSG - FIN
 /* Per-parent RPL information */
 NBR_TABLE_DECLARE(rpl_parents);

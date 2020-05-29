@@ -138,6 +138,17 @@ position_to_str(char *str)
     node_position.y[0],
     node_position.type[0]);
 }
+/*---------------------------------------------------------------------------*/
+void 
+position_to_JSON(char *str)
+{
+  sprintf(str, "{\"IP\":\"%02x\",\"x\":\"%u\",\"y\":\"%u\",\"type\":\"%c\"}",
+    node_position.ipaddr[0].u8[15],
+    node_position.x[0],
+    node_position.y[0],
+    node_position.type[0]);
+}
+/*---------------------------------------------------------------------------*/
 uip_ipaddr_t
 get_local_address()
 {

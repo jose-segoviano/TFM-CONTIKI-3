@@ -123,7 +123,7 @@ send_packet(void *ptr)
     {
       x_std = node_position->x[0];
       y_std = node_position->y[0];
-          position_to_str(buf);
+      position_to_str(buf);
       printf("JSG - buf:%s\n", buf);
       //sprintf(buf, position_to_str());
       uip_udp_packet_sendto(client_conn, buf, strlen(buf),
