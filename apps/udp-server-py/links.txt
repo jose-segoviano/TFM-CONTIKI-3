@@ -1,2 +1,2 @@
-https://demo.thingsboard.io:/dashboard/a86541c0-a108-11ea-a009-773c316ae2d0?publicId=143db070-a10f-11ea-a009-773c316ae2d0
+
 https://demo.thingsboard.io:/dashboard/3405ce50-a25f-11ea-867b-0be9038794d9?publicId=143db070-a10f-11ea-a009-773c316ae2d0
