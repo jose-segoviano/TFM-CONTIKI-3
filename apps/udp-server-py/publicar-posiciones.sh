@@ -1,4 +1,5 @@
-mosquitto_pub -h localhost -t "/position/05" -m "1|1|R"
-mosquitto_pub -h localhost -t "/position/06" -m "30|10|R"
-mosquitto_pub -h localhost -t "/position/07" -m "10|30|R"
-python udp-server.py
+mosquitto_pub -h localhost -t "/position/08" -m "45|45|R"
+mosquitto_pub -h localhost -t "/position/09" -m "45|75|R"
+mosquitto_pub -h localhost -t "/position/0a" -m "75|45|R"
+mosquitto_pub -h localhost -t "/position/0b" -m "75|75|R"
+#python udp-server.py

@@ -118,8 +118,9 @@ typedef struct mqtt_client_config {
   uint16_t broker_port;
 } mqtt_client_config_t;
 
-static int x_std, y_std;
-static unsigned char type;
+static uint16_t x_std = 0;
+static uint16_t y_std = 0;
+static unsigned char type = RPL_NODE_POSITION_TYPE_MOBILE;
 
 /*---------------------------------------------------------------------------*/
 /* Maximum TCP segment size for outgoing segments of our socket */
@@ -333,10 +334,10 @@ publish(void)
 
   rpl_node_position_t *node_position = rpl_get_node_position();
   //position_to_str(buf_ptr);
-  position_to_JSON(buf_ptr);
-  printf("JSG - buf:%s\n", buf_ptr);
-  mqtt_publish(&conn, NULL, pub_topic, (uint8_t *)app_buffer,
-               strlen(app_buffer), MQTT_QOS_LEVEL_0, MQTT_RETAIN_OFF);
+  //position_to_JSON(buf_ptr);
+  //printf("JSG - buf:%s\n", buf_ptr);
+  //mqtt_publish(&conn, NULL, pub_topic, (uint8_t *)app_buffer,
+    //           strlen(app_buffer), MQTT_QOS_LEVEL_0, MQTT_RETAIN_OFF);
 
   if (node_position->x[0] != 0 && node_position->y[0] != 0)
   {
@@ -345,7 +346,7 @@ publish(void)
     {
       x_std = node_position->x[0];
       y_std = node_position->y[0];
-      position_to_str(buf_ptr);
+      position_to_JSON(buf_ptr);
       printf("JSG - buf:%s\n", buf_ptr);
       mqtt_publish(&conn, NULL, pub_topic, (uint8_t *)app_buffer,
                strlen(app_buffer), MQTT_QOS_LEVEL_0, MQTT_RETAIN_OFF);
@@ -527,10 +528,6 @@ state_machine(void)
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(mqtt_demo_process, ev, data)
 {
-
-  x_std = 0;
-  y_std = 0;
-  type = RPL_NODE_POSITION_TYPE_MOBILE;
 
   PROCESS_BEGIN();
 
