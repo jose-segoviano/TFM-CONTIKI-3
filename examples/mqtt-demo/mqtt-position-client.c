@@ -136,7 +136,7 @@ static unsigned char type;
 #define BUFFER_SIZE 64
 static char client_id[BUFFER_SIZE];
 static char pub_topic[BUFFER_SIZE];
-static char sub_topic[BUFFER_SIZE];
+//static char sub_topic[BUFFER_SIZE];
 /*---------------------------------------------------------------------------*/
 /*
  * The main MQTT buffers.
@@ -188,21 +188,6 @@ ipaddr_sprintf(char *buf, uint8_t buf_len, const uip_ipaddr_t *addr)
   return len;
 }
 /*---------------------------------------------------------------------------*/
-static void 
-pub_handler(const uint8_t *chunk, uint16_t chunk_len)
-{
-  uint16_t x, y;
-  unsigned char *type;
-  char * token = strtok((char *)chunk, "|");
-
-  x = atoi(token);
-  y = atoi(strtok(NULL, "|"));
-  type = (unsigned char *)strtok(NULL, "|");
-
-  printf("JSG - pub_handler - x:%u y:%u type:%s\n", x, y, type);
-  rpl_set_node_position(x, y, *type);  
-}
-/*---------------------------------------------------------------------------*/
 static void
 mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
 {
@@ -230,9 +215,6 @@ mqtt_event(struct mqtt_connection *m, mqtt_event_t event, void *data)
           "size is %i bytes. Content:\n\n",
           msg_ptr->topic, msg_ptr->payload_length);
     }
-    // JSG - Después de inicializar el root del DAG, vamos a establecer las coordenadas de los nodos referencia.
-    pub_handler(msg_ptr->payload_chunk, msg_ptr->payload_length);
-    // JSG - FIN
     break;
   }
   case MQTT_EVENT_SUBACK: {
@@ -270,20 +252,6 @@ construct_pub_topic(void)
 }
 /*---------------------------------------------------------------------------*/
 static int
-construct_sub_topic(void)
-{
-  int len = snprintf(sub_topic, BUFFER_SIZE, "/position/%02x", linkaddr_node_addr.u8[7]);
-
-  /* len < 0: Error. Len >= BUFFER_SIZE: Buffer too small */
-  if(len < 0 || len >= BUFFER_SIZE) {
-    printf("Sub Topic: %d, Buffer %d\n", len, BUFFER_SIZE);
-    return 0;
-  }
-
-  return 1;
-}
-/*---------------------------------------------------------------------------*/
-static int
 construct_client_id(void)
 {
   int len = snprintf(client_id, BUFFER_SIZE, "d:%s:%s:%02x%02x%02x%02x%02x%02x",
@@ -306,12 +274,6 @@ update_config(void)
 {
   if(construct_client_id() == 0) {
     /* Fatal error. Client ID larger than the buffer */
-    state = STATE_CONFIG_ERROR;
-    return;
-  }
-
-  if(construct_sub_topic() == 0) {
-    /* Fatal error. Topic larger than the buffer */
     state = STATE_CONFIG_ERROR;
     return;
   }
@@ -359,20 +321,6 @@ init_config()
   conf.def_rt_ping_interval = DEFAULT_RSSI_MEAS_INTERVAL;
 
   return 1;
-}
-/*---------------------------------------------------------------------------*/
-static void
-subscribe(void)
-{
-  /* Publish MQTT topic in IBM quickstart format */
-  mqtt_status_t status;
-
-  status = mqtt_subscribe(&conn, NULL, sub_topic, MQTT_QOS_LEVEL_0);
-
-  DBG("APP - Subscribing!\n");
-  if(status == MQTT_STATUS_OUT_QUEUE_FULL) {
-    DBG("APP - Tried to subscribe but command queue was full!\n");
-  }
 }
 /*---------------------------------------------------------------------------*/
 static void
@@ -510,7 +458,7 @@ state_machine(void)
     if(mqtt_ready(&conn) && conn.out_buffer_sent) {
       /* Connected. Publish */
       if(state == STATE_CONNECTED) {
-        subscribe();
+        //subscribe();
         state = STATE_PUBLISHING;
       } else {
         publish();
