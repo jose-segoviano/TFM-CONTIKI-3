@@ -309,8 +309,8 @@ struct rpl_dio {
   rpl_prefix_t destination_prefix;
   rpl_prefix_t prefix_info;
   struct rpl_metric_container mc;
-  uint8_t x; // JSG - X coordenate node from
-  uint8_t y; // JSG - Y coordenate node from
+  uint16_t x; // JSG - X coordenate node from
+  uint16_t y; // JSG - Y coordenate node from
   int16_t rssi; // JSG - RSSI node from
   unsigned char type; // JSG - node type. mobile or reference
 };

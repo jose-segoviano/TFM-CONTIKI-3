@@ -462,7 +462,7 @@ dio_input(void)
         //printf("JSG - len:%i\n", len);
         //printf("JSG - position x:%u, y:%u, type:%c\n", dio.x, dio.y, dio.type);
         break;
-        // JSG - FIN
+        // JSG - END
       default:
         PRINTF("RPL: Unsupported suboption type in DIO: %u\n",
                (unsigned)subopt_type);
@@ -617,7 +617,7 @@ dio_output(rpl_instance_t *instance, uip_ipaddr_t *uc_addr)
   //buffer[pos++] = node_position->y[0]; // con uint8
   buffer[pos++] = node_position->type[0];
   //printf("JSG - output length: %i\n", pos);
-  // JSG - FIN
+  // JSG - END
 
 #if RPL_LEAF_ONLY
 #if (DEBUG) & DEBUG_PRINT

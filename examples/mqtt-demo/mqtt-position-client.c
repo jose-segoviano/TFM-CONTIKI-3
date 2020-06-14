@@ -93,7 +93,7 @@ static uint8_t state;
 #define DEFAULT_EVENT_TYPE_ID       "status"
 #define DEFAULT_SUBSCRIBE_CMD_TYPE  "+"
 #define DEFAULT_BROKER_PORT         1883
-#define DEFAULT_PUBLISH_INTERVAL    (3 * CLOCK_SECOND)
+#define DEFAULT_PUBLISH_INTERVAL    (10 * CLOCK_SECOND)
 #define DEFAULT_KEEP_ALIVE_TIMER    60
 #define DEFAULT_RSSI_MEAS_INTERVAL  (CLOCK_SECOND * 30)
 /*---------------------------------------------------------------------------*/
@@ -120,7 +120,7 @@ typedef struct mqtt_client_config {
 
 static uint16_t x_std = 0;
 static uint16_t y_std = 0;
-static unsigned char type = RPL_NODE_POSITION_TYPE_MOBILE;
+//static unsigned char type = RPL_NODE_POSITION_TYPE_MOBILE;
 
 /*---------------------------------------------------------------------------*/
 /* Maximum TCP segment size for outgoing segments of our socket */
@@ -352,11 +352,11 @@ publish(void)
                strlen(app_buffer), MQTT_QOS_LEVEL_0, MQTT_RETAIN_OFF);
 
       //type = RPL_NODE_POSITION_TYPE_MOBILE;
-      rpl_set_node_position(x_std, y_std, type);
+      rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_MOBILE);
     } else {
-      printf("JSG - Cambio a referencia\n");
-      //type = RPL_NODE_POSITION_TYPE_REFERENCE;
-      rpl_set_node_position(x_std, y_std, type);
+      //printf("JSG - Cambio a referencia\n");
+      //type = RPL_NODE_POSITION_TYPE_REF_TEMP;
+      rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_REF_TEMP);
     }   
   }
 

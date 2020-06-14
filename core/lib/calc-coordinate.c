@@ -1,9 +1,9 @@
 #include "net/rpl/rpl.h"
 #include <stdio.h>
-//#define THETA1  -0.5875 // Variable para motas Sky y Z1
-//#define THETA2  -5.5794 // Variable para motas Sky y Z1
-#define THETA1  -0.3928 // Variable para motas wismote
-#define THETA2  -15.921 // Variable para motas wismote
+//#define THETA1  -0.5875 // Variable for Sky and Z1 motes
+//#define THETA2  -5.5794 // Variable for Sky and Z1 motes
+#define THETA1  -0.3928 // Variable for wismote motes
+#define THETA2  -15.921 // Variable for wismote motes
 
 /*---------------------------------------------------------------------------*/
 int32_t convert_distancia(int32_t rssi){

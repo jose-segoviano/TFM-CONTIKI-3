@@ -88,8 +88,9 @@ typedef uint16_t rpl_ocp_t;
 // JSG - INI Object definition to work with position
 #define RPL_NODE_POSITION_TYPE_MOBILE 'M'
 #define RPL_NODE_POSITION_TYPE_REFERENCE 'R'
-#ifndef LAST_UPDATE_LIMIT
-#define LAST_UPDATE_LIMIT  100
+#define RPL_NODE_POSITION_TYPE_REF_TEMP 'T'
+#ifndef LAST_UPDATE_LIMIT // Used to update node reference in table of position calculate
+#define LAST_UPDATE_LIMIT  400
 #endif // LAST_UPDATE_LIMIT
 
 struct rpl_node_position {
@@ -101,7 +102,7 @@ struct rpl_node_position {
   uip_ipaddr_t ipaddr[4];
 };
 typedef struct rpl_node_position rpl_node_position_t;
-//JSG - FIN
+//JSG - END
 /*---------------------------------------------------------------------------*/
 struct rpl_metric_object_energy {
   uint8_t flags;
@@ -318,7 +319,7 @@ rpl_node_position_t *rpl_get_node_position(void);
 void rpl_print_positions(const char *str);
 void position_to_str(char *str);
 void position_to_JSON(char *str);
-// JSG - FIN
+// JSG - END
 /* Per-parent RPL information */
 NBR_TABLE_DECLARE(rpl_parents);
 
