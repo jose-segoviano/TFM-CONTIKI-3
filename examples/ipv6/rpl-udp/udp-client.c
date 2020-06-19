@@ -128,11 +128,11 @@ send_packet(void *ptr)
       //sprintf(buf, position_to_str());
       uip_udp_packet_sendto(client_conn, buf, strlen(buf),
                         &server_ipaddr, UIP_HTONS(UDP_SERVER_PORT));
-      //type = RPL_NODE_POSITION_TYPE_MOBILE;
+      type = RPL_NODE_POSITION_TYPE_MOBILE;
       rpl_set_node_position(x_std, y_std, type);
     } else {
       printf("JSG - Cambio a referencia\n");
-      //type = RPL_NODE_POSITION_TYPE_REFERENCE;
+      type = RPL_NODE_POSITION_TYPE_REF_TEMP;
       rpl_set_node_position(x_std, y_std, type);
     }   
   }
@@ -190,7 +190,6 @@ set_global_address(void)
    uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0, 0, 1);
 #elif 1
 /* Mode 2 - 16 bits inline */
-  //uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0x00ff, 0xfe00, 1);
   uip_ip6addr(&server_ipaddr, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0, 0, 0x0001); //JSG - localhost
 #else
 /* Mode 3 - derived from server link-local (MAC) address */

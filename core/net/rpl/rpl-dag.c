@@ -94,6 +94,27 @@ rpl_node_position_t node_position;
 /*---------------------------------------------------------------------------*/
 // JSG - INI - Functions to get and update the position
 /*---------------------------------------------------------------------------*/
+uip_ipaddr_t
+get_local_address()
+{
+  int i;
+  uint8_t state;
+  uip_ipaddr_t ipaddr;
+
+  for(i = 0; i < UIP_DS6_ADDR_NB; i++) {
+    state = uip_ds6_if.addr_list[i].state;
+    if(uip_ds6_if.addr_list[i].isused &&
+       (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
+      /* hack to make address "final" */
+      if (state == ADDR_TENTATIVE) {
+        uip_ds6_if.addr_list[i].state = ADDR_PREFERRED;
+      }
+      return uip_ds6_if.addr_list[i].ipaddr;
+    }
+  }
+  return ipaddr;
+}
+/*---------------------------------------------------------------------------*/
 void
 rpl_node_position_init()
 {
@@ -107,6 +128,7 @@ rpl_node_position_init()
     node_position.last_update[i] = 0;
     node_position.type[i] = RPL_NODE_POSITION_TYPE_MOBILE;
   }
+  node_position.ipaddr[0] = get_local_address();
 }
 /*---------------------------------------------------------------------------*/
 void
@@ -115,7 +137,7 @@ rpl_print_positions(const char *str)
   uint8_t i;
   for (i = 0; i<4; i++) {
     
-    printf("JSG - %u - %s - rpl_print_positions - x:%u, y:%u, RSSI:%i - ip:%3u, time:%lu, type:%c, elemento:%i\n", 
+    printf("JSG - %02x - %s - rpl_print_positions - x:%u, y:%u, RSSI:%i - ip:%02x, time:%lu, type:%c, elemento:%i\n", 
             node_position.ipaddr[0].u8[15],
             str,
             node_position.x[i],
@@ -148,27 +170,6 @@ position_to_JSON(char *str)
     node_position.type[0]);
 }
 /*---------------------------------------------------------------------------*/
-uip_ipaddr_t
-get_local_address()
-{
-  int i;
-  uint8_t state;
-  uip_ipaddr_t ipaddr;
-
-  for(i = 0; i < UIP_DS6_ADDR_NB; i++) {
-    state = uip_ds6_if.addr_list[i].state;
-    if(uip_ds6_if.addr_list[i].isused &&
-       (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
-      /* hack to make address "final" */
-      if (state == ADDR_TENTATIVE) {
-        uip_ds6_if.addr_list[i].state = ADDR_PREFERRED;
-      }
-      return uip_ds6_if.addr_list[i].ipaddr;
-    }
-  }
-  return ipaddr;
-}
-/*---------------------------------------------------------------------------*/
 void 
 rpl_set_node_position(uint16_t x, uint16_t y, unsigned char type)
 {
@@ -178,6 +179,7 @@ rpl_set_node_position(uint16_t x, uint16_t y, unsigned char type)
   node_position.last_update[0] = clock_seconds();
   node_position.type[0] = type;
   node_position.ipaddr[0] = get_local_address();
+  printf("JSG - ip:%02x\n", node_position.ipaddr[0].u8[15]);
 }
 /*---------------------------------------------------------------------------*/
 rpl_node_position_t *
@@ -232,7 +234,7 @@ rpl_set_node_position_ip_nbr(uint16_t x, uint16_t y, int16_t rssi, uip_ipaddr_t 
   */
   //int16_t rssi_temp = rssi;
 
-  printf("JSG - %u - rpl_set_node_position_ip_nbr - x:%u, y:%u, rssi:%i, ip:%3u, type:%c\n", node_position.ipaddr[0].u8[15], x, y, rssi, ipaddr.u8[15], type);
+  printf("JSG - %02x - rpl_set_node_position_ip_nbr - x:%u, y:%u, rssi:%i, ip:%3u, type:%c\n", node_position.ipaddr[0].u8[15], x, y, rssi, ipaddr.u8[15], type);
   if (x != 0 && y != 0){
 
     unsigned char sigue;
@@ -1643,13 +1645,10 @@ rpl_process_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
   instance = rpl_get_instance(dio->instance_id);
 
   // JSG - INI
-  //printf("JSG - DIO - x:%u, y:%u, type:%c, ip%3u\n", dio->x, dio->y, dio->type, from->u8[15]);
   if (node_position.type[0] != RPL_NODE_POSITION_TYPE_REFERENCE){
-    if (dio->type != RPL_NODE_POSITION_TYPE_MOBILE) { // coordinates are calculated when neighbor is reference or temporary reference
+    if (dio->type != RPL_NODE_POSITION_TYPE_MOBILE) { 
       rpl_set_node_position_ip_nbr(dio->x, dio->y, dio->rssi, *from, dio->type);
       set_node_position_calculated(&node_position);  
-    } else {
-      rpl_clean_position_table(*from);
     }
   }
   rpl_print_positions("Dio");

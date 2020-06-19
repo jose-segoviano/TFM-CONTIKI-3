@@ -40,8 +40,12 @@ void set_node_position_calculated(rpl_node_position_t *node_position) {
 
     x = (a*Y32 + b*Y13 + c*Y21)/(2*(r1x*Y32 + r2x*Y13 + r3x*Y21));
     y = (a*X32 + b*X13 + c*X21)/(2*(r1y*X32 + r2y*X13 + r3y*X21));
-    node_position->x[0] = x;
-    node_position->y[0] = y;
-    node_position->last_update[0] = clock_seconds();
+    if (node_position->x[0] != x && node_position->y[0] != y) {
+        node_position->x[0] = x;
+        node_position->y[0] = y;
+        node_position->last_update[0] = clock_seconds();   
+        node_position->type[0] = RPL_NODE_POSITION_TYPE_MOBILE;
+    }
+    
   }
 }
