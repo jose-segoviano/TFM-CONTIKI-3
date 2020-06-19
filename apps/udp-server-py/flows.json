@@ -1,1 +1,506 @@
-[{"id":"1f662bfd.5e2144","type":"tab","label":"Flow 1","disabled":false,"info":""},{"id":"23d9042c.34e4f4","type":"inject","z":"1f662bfd.5e2144","name":"","topic":"prueba","payload":"{\"IP\":\"07\",\"x\":\"0.08\",\"y\":\"0.13\",\"type\":\"M\"}","payloadType":"json","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":530,"y":40,"wires":[["deb828da.c05268"]]},{"id":"f397ce76.f3759","type":"mqtt in","z":"1f662bfd.5e2144","name":"mosquitto localhost","topic":"v1/devices/me/telemetry","qos":"2","datatype":"json","broker":"8ebdcad3.72d1f","x":110,"y":60,"wires":[["ddcb6f83.a93f6"]]},{"id":"21d7282f.7e6c7","type":"debug","z":"1f662bfd.5e2144","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload.IP","targetType":"msg","x":460,"y":600,"wires":[]},{"id":"deb828da.c05268","type":"mqtt out","z":"1f662bfd.5e2144","name":"Mota 7","topic":"v1/devices/me/telemetry","qos":"","retain":"","broker":"ceae6f4c.110d4","x":690,"y":40,"wires":[]},{"id":"635dc05e.a4e04","type":"inject","z":"1f662bfd.5e2144","name":"","topic":"prueba","payload":"{\"IP\":\"02\",\"x\":\"0.93\",\"y\":\"0.89\",\"type\":\"M\"}","payloadType":"json","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":610,"y":120,"wires":[["2e7b5f22.94d368"]]},{"id":"2e7b5f22.94d368","type":"mqtt out","z":"1f662bfd.5e2144","name":"Mota 2","topic":"v1/devices/me/telemetry","qos":"","retain":"","broker":"18fa58b1.413487","x":730,"y":140,"wires":[]},{"id":"a55027e.27f7358","type":"mqtt out","z":"1f662bfd.5e2144","name":"Mota 3","topic":"v1/devices/me/telemetry","qos":"","retain":"","broker":"efb26363.7111f8","x":750,"y":240,"wires":[]},{"id":"f94a6930.87c52","type":"mqtt out","z":"1f662bfd.5e2144","name":"Mota 6","topic":"v1/devices/me/telemetry","qos":"","retain":"","broker":"96dbbd7a.0ed08","x":730,"y":500,"wires":[]},{"id":"d7783467.e5007","type":"inject","z":"1f662bfd.5e2144","name":"","topic":"prueba","payload":"{\"IP\":\"03\",\"x\":\"0.93\",\"y\":\"0.13\",\"type\":\"M\"}","payloadType":"json","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":610,"y":200,"wires":[["a55027e.27f7358"]]},{"id":"4cdf30af.40884","type":"inject","z":"1f662bfd.5e2144","name":"","topic":"prueba","payload":"{\"IP\":\"04\",\"x\":\"0.08\",\"y\":\"0.89\",\"type\":\"M\"}","payloadType":"json","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":610,"y":340,"wires":[["750c24a0.1c183c"]]},{"id":"9cef4ac8.425f28","type":"inject","z":"1f662bfd.5e2144","name":"","topic":"prueba","payload":"{\"IP\":\"06\",\"x\":\"0.8\",\"y\":\"0.4\",\"type\":\"M\"}","payloadType":"json","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":590,"y":540,"wires":[["f94a6930.87c52"]]},{"id":"750c24a0.1c183c","type":"mqtt out","z":"1f662bfd.5e2144","name":"Mota 4","topic":"v1/devices/me/telemetry","qos":"","retain":"","broker":"faa55da5.a08d88","x":730,"y":320,"wires":[]},{"id":"8cd0e107.71c4b","type":"inject","z":"1f662bfd.5e2144","name":"","topic":"prueba","payload":"{\"IP\":\"05\",\"x\":\"0.5\",\"y\":\"0.25\",\"type\":\"M\"}","payloadType":"json","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":590,"y":420,"wires":[["4fb99cf1.9b8274"]]},{"id":"4fb99cf1.9b8274","type":"mqtt out","z":"1f662bfd.5e2144","name":"Mota 5","topic":"v1/devices/me/telemetry","qos":"","retain":"","broker":"bf6649c.243a5b8","x":730,"y":400,"wires":[]},{"id":"ddcb6f83.a93f6","type":"switch","z":"1f662bfd.5e2144","name":"","property":"payload.IP","propertyType":"msg","rules":[{"t":"eq","v":"07","vt":"str"},{"t":"eq","v":"02","vt":"str"},{"t":"eq","v":"03","vt":"str"},{"t":"eq","v":"04","vt":"str"},{"t":"eq","v":"05","vt":"str"},{"t":"eq","v":"06","vt":"str"},{"t":"else"}],"checkall":"true","repair":false,"outputs":7,"x":270,"y":280,"wires":[["deb828da.c05268"],["2e7b5f22.94d368"],["a55027e.27f7358"],["750c24a0.1c183c"],["4fb99cf1.9b8274"],["f94a6930.87c52"],["21d7282f.7e6c7"]]},{"id":"8ebdcad3.72d1f","type":"mqtt-broker","z":"","name":"mosquitto-local","broker":"127.0.0.1","port":"1883","clientid":"","usetls":false,"compatmode":false,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","closeTopic":"","closeQos":"0","closePayload":"","willTopic":"","willQos":"0","willPayload":""},{"id":"ceae6f4c.110d4","type":"mqtt-broker","z":"","name":"Mota 7","broker":"demo.thingsboard.io","port":"1883","clientid":"","usetls":false,"compatmode":false,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","closeTopic":"","closeQos":"0","closePayload":"","willTopic":"","willQos":"0","willPayload":""},{"id":"18fa58b1.413487","type":"mqtt-broker","z":"","name":"mota-2","broker":"demo.thingsboard.io","port":"1883","clientid":"","usetls":false,"compatmode":false,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","closeTopic":"","closeQos":"0","closePayload":"","willTopic":"","willQos":"0","willPayload":""},{"id":"efb26363.7111f8","type":"mqtt-broker","z":"","name":"Mota 3","broker":"demo.thingsboard.io","port":"1883","clientid":"","usetls":false,"compatmode":false,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","closeTopic":"","closeQos":"0","closePayload":"","willTopic":"","willQos":"0","willPayload":""},{"id":"96dbbd7a.0ed08","type":"mqtt-broker","z":"","name":"Mota 6","broker":"demo.thingsboard.io","port":"1883","clientid":"","usetls":false,"compatmode":false,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","closeTopic":"","closeQos":"0","closePayload":"","willTopic":"","willQos":"0","willPayload":""},{"id":"faa55da5.a08d88","type":"mqtt-broker","z":"","name":"Mota 4","broker":"demo.thingsboard.io","port":"1883","clientid":"","usetls":false,"compatmode":false,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","closeTopic":"","closeQos":"0","closePayload":"","willTopic":"","willQos":"0","willPayload":""},{"id":"bf6649c.243a5b8","type":"mqtt-broker","z":"","name":"Mota 5","broker":"demo.thingsboard.io","port":"1883","clientid":"","usetls":false,"compatmode":false,"keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","closeTopic":"","closeQos":"0","closePayload":"","willTopic":"","willQos":"0","willPayload":""}]
+[
+    {
+        "id": "1f662bfd.5e2144",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "23d9042c.34e4f4",
+        "type": "inject",
+        "z": "1f662bfd.5e2144",
+        "name": "",
+        "topic": "prueba",
+        "payload": "{\"IP\":\"07\",\"x\":\"0.6\",\"y\":\"0.1\",\"type\":\"M\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 530,
+        "y": 40,
+        "wires": [
+            [
+                "deb828da.c05268"
+            ]
+        ]
+    },
+    {
+        "id": "f397ce76.f3759",
+        "type": "mqtt in",
+        "z": "1f662bfd.5e2144",
+        "name": "mosquitto localhost",
+        "topic": "v1/devices/me/telemetry",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "8ebdcad3.72d1f",
+        "x": 110,
+        "y": 60,
+        "wires": [
+            [
+                "478789b2.0bbaa8"
+            ]
+        ]
+    },
+    {
+        "id": "21d7282f.7e6c7",
+        "type": "debug",
+        "z": "1f662bfd.5e2144",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload.IP",
+        "targetType": "msg",
+        "x": 460,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "deb828da.c05268",
+        "type": "mqtt out",
+        "z": "1f662bfd.5e2144",
+        "name": "Mota 7",
+        "topic": "v1/devices/me/telemetry",
+        "qos": "",
+        "retain": "",
+        "broker": "ceae6f4c.110d4",
+        "x": 690,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "635dc05e.a4e04",
+        "type": "inject",
+        "z": "1f662bfd.5e2144",
+        "name": "",
+        "topic": "prueba",
+        "payload": "{\"IP\":\"02\",\"x\":\"0.1\",\"y\":\"0.1\",\"type\":\"M\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 610,
+        "y": 120,
+        "wires": [
+            [
+                "2e7b5f22.94d368"
+            ]
+        ]
+    },
+    {
+        "id": "2e7b5f22.94d368",
+        "type": "mqtt out",
+        "z": "1f662bfd.5e2144",
+        "name": "Mota 2",
+        "topic": "v1/devices/me/telemetry",
+        "qos": "",
+        "retain": "",
+        "broker": "18fa58b1.413487",
+        "x": 730,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "a55027e.27f7358",
+        "type": "mqtt out",
+        "z": "1f662bfd.5e2144",
+        "name": "Mota 3",
+        "topic": "v1/devices/me/telemetry",
+        "qos": "",
+        "retain": "",
+        "broker": "efb26363.7111f8",
+        "x": 750,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "f94a6930.87c52",
+        "type": "mqtt out",
+        "z": "1f662bfd.5e2144",
+        "name": "Mota 6",
+        "topic": "v1/devices/me/telemetry",
+        "qos": "",
+        "retain": "",
+        "broker": "96dbbd7a.0ed08",
+        "x": 730,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "d7783467.e5007",
+        "type": "inject",
+        "z": "1f662bfd.5e2144",
+        "name": "",
+        "topic": "prueba",
+        "payload": "{\"IP\":\"03\",\"x\":\"0.2\",\"y\":\"0.1\",\"type\":\"M\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 610,
+        "y": 200,
+        "wires": [
+            [
+                "a55027e.27f7358"
+            ]
+        ]
+    },
+    {
+        "id": "4cdf30af.40884",
+        "type": "inject",
+        "z": "1f662bfd.5e2144",
+        "name": "",
+        "topic": "prueba",
+        "payload": "{\"IP\":\"04\",\"x\":\"0.3\",\"y\":\"0.1\",\"type\":\"M\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 610,
+        "y": 340,
+        "wires": [
+            [
+                "750c24a0.1c183c"
+            ]
+        ]
+    },
+    {
+        "id": "9cef4ac8.425f28",
+        "type": "inject",
+        "z": "1f662bfd.5e2144",
+        "name": "",
+        "topic": "prueba",
+        "payload": "{\"IP\":\"06\",\"x\":\"0.5\",\"y\":\"0.1\",\"type\":\"M\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 590,
+        "y": 540,
+        "wires": [
+            [
+                "f94a6930.87c52"
+            ]
+        ]
+    },
+    {
+        "id": "750c24a0.1c183c",
+        "type": "mqtt out",
+        "z": "1f662bfd.5e2144",
+        "name": "Mota 4",
+        "topic": "v1/devices/me/telemetry",
+        "qos": "",
+        "retain": "",
+        "broker": "faa55da5.a08d88",
+        "x": 730,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "8cd0e107.71c4b",
+        "type": "inject",
+        "z": "1f662bfd.5e2144",
+        "name": "",
+        "topic": "prueba",
+        "payload": "{\"IP\":\"05\",\"x\":\"0.4\",\"y\":\"0.1\",\"type\":\"M\"}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 590,
+        "y": 420,
+        "wires": [
+            [
+                "4fb99cf1.9b8274"
+            ]
+        ]
+    },
+    {
+        "id": "4fb99cf1.9b8274",
+        "type": "mqtt out",
+        "z": "1f662bfd.5e2144",
+        "name": "Mota 5",
+        "topic": "v1/devices/me/telemetry",
+        "qos": "",
+        "retain": "",
+        "broker": "bf6649c.243a5b8",
+        "x": 730,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "ddcb6f83.a93f6",
+        "type": "switch",
+        "z": "1f662bfd.5e2144",
+        "name": "",
+        "property": "payload.IP",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "07",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "02",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "03",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "04",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "05",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "06",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 7,
+        "x": 270,
+        "y": 280,
+        "wires": [
+            [
+                "deb828da.c05268"
+            ],
+            [
+                "2e7b5f22.94d368"
+            ],
+            [
+                "a55027e.27f7358"
+            ],
+            [
+                "750c24a0.1c183c"
+            ],
+            [
+                "4fb99cf1.9b8274"
+            ],
+            [
+                "f94a6930.87c52"
+            ],
+            [
+                "21d7282f.7e6c7"
+            ]
+        ]
+    },
+    {
+        "id": "478789b2.0bbaa8",
+        "type": "function",
+        "z": "1f662bfd.5e2144",
+        "name": "trans_coordinates",
+        "func": "var x = msg.payload.x;\nvar y = msg.payload.y;\nif (x > 0){\n    msg.payload.x = x/100;\n}\nif (y > 0){\n    msg.payload.y = y/100;\n}\nmsg.payload.timestamp = new Date().toString();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 160,
+        "y": 160,
+        "wires": [
+            [
+                "ddcb6f83.a93f6",
+                "e0f761b4.b43ba8"
+            ]
+        ]
+    },
+    {
+        "id": "e0f761b4.b43ba8",
+        "type": "mongodb-node",
+        "z": "1f662bfd.5e2144",
+        "mongodb": "43bc4936.6f22b",
+        "name": "Mongodb",
+        "collection": "list_positions",
+        "operation": "store",
+        "upsert": false,
+        "multi": false,
+        "x": 340,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8ebdcad3.72d1f",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "mosquitto-local",
+        "broker": "127.0.0.1",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "ceae6f4c.110d4",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Mota 7",
+        "broker": "demo.thingsboard.io",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "18fa58b1.413487",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "mota-2",
+        "broker": "demo.thingsboard.io",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "efb26363.7111f8",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Mota 3",
+        "broker": "demo.thingsboard.io",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "96dbbd7a.0ed08",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Mota 6",
+        "broker": "demo.thingsboard.io",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "faa55da5.a08d88",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Mota 4",
+        "broker": "demo.thingsboard.io",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "bf6649c.243a5b8",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Mota 5",
+        "broker": "demo.thingsboard.io",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "43bc4936.6f22b",
+        "type": "mongodb-config",
+        "z": "",
+        "hostname": "127.0.0.1",
+        "port": "27017",
+        "db": "positions",
+        "name": ""
+    }
+]
