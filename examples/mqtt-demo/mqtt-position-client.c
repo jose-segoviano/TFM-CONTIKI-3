@@ -62,6 +62,11 @@ static const char *broker_ip = MQTT_DEMO_BROKER_IP_ADDR;
 static struct timer connection_life;
 static uint8_t connect_attempt;
 /*---------------------------------------------------------------------------*/
+// JSG - INI 
+#ifndef PERIOD
+#define PERIOD 10
+#endif
+// JSG - END
 /* Various states */
 static uint8_t state;
 #define STATE_INIT            0
@@ -93,7 +98,7 @@ static uint8_t state;
 #define DEFAULT_EVENT_TYPE_ID       "status"
 #define DEFAULT_SUBSCRIBE_CMD_TYPE  "+"
 #define DEFAULT_BROKER_PORT         1883
-#define DEFAULT_PUBLISH_INTERVAL    (10 * CLOCK_SECOND)
+#define DEFAULT_PUBLISH_INTERVAL    (PERIOD * CLOCK_SECOND) // JSG - You can define PERIODO in Makefile
 #define DEFAULT_KEEP_ALIVE_TIMER    60
 #define DEFAULT_RSSI_MEAS_INTERVAL  (CLOCK_SECOND * 30)
 /*---------------------------------------------------------------------------*/
@@ -354,9 +359,9 @@ publish(void)
       //type = RPL_NODE_POSITION_TYPE_MOBILE;
       rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_MOBILE);
     } else {
-      //printf("JSG - Cambio a referencia\n");
+      printf("JSG - Cambio a referencia\n");
       //type = RPL_NODE_POSITION_TYPE_REF_TEMP;
-      rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_REF_TEMP);
+      //rpl_set_node_position(x_std, y_std, RPL_NODE_POSITION_TYPE_REF_TEMP);
     }   
   }
 
