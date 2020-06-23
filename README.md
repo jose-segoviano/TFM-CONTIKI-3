@@ -17,3 +17,7 @@ and so on.
 For more information, see the Contiki website:
 
 [http://contiki-os.org](http://contiki-os.org)
+
+
+This repository is an upgrade developed for an end project degree.
+The aim of the project is to have a system indoor positioning working with 6LoWPAN and RPL and using Contiki as operative system.
